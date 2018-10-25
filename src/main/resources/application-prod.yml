@@ -1,0 +1,15 @@
+config:
+  path: classpath:config/prod
+
+mybatis:
+  type-aliases-package: com.example.boot.model
+  configuration:
+    map-underscore-to-camel-case: true
+spring:
+  mvc:
+    static-path-pattern: /static/**
+  gson:
+    serialize-nulls: true
+    date-format: yyyy-MM-dd HH:mm:ss
+server:
+  port: 9000

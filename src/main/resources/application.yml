@@ -1,0 +1,3 @@
+spring:
+  profiles:
+    active: @profileActive@ #获取pom中profile的环境值,profileActive为自定义properties
