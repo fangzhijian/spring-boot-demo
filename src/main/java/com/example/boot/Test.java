@@ -12,6 +12,6 @@ public class Test {
 
         Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.0.34:3306/test?characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false","root","root");
         System.out.println(connection.isReadOnly());
-        System.out.println("我爱你老婆");
+        System.out.println(" 我爱你老婆");
     }
 }
