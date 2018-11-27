@@ -1,6 +1,9 @@
 package com.example.boot;
 
+import com.example.boot.model.User;
 import com.example.boot.util.HttpUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -14,7 +17,16 @@ import java.util.Date;
  */
 public class Test {
     public static void main(String[] args) throws Exception{
-        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
+        User user = new User();
+        user.setId(2);
+        user.setName("大壳");
+        user.setCreateTime(new Date());
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String userJson = gson.toJson(user);
+        System.out.println(userJson);
+        String path = "http://localhost:9000/efg?name=123@qq.com";
+//        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
+//        String path = "http://localhost:9000/hij?userJson="+userJson;
         URL url = new URL(HttpUtil.getEncodeUrl(path));
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
