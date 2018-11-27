@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Date;
 
 /**
  * 2018/10/10 14:21
@@ -33,6 +36,20 @@ public class IndexController {
         log.info(body.getName());
         User user = userMapper.getById(1);
         user.setName(null);
+        return user;
+    }
+
+    @GetMapping("abc")
+    public String abc(RedirectAttributes redirectAttributes){
+        redirectAttributes.addAttribute("id",3);
+        redirectAttributes.addAttribute("name","猪大肠");
+        redirectAttributes.addAttribute("createTime",new Date().toString());
+        return "redirect:efg";
+    }
+
+    @GetMapping("efg")
+    @ResponseBody
+    public User efg(User user){
         return user;
     }
 }
