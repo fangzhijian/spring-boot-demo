@@ -13,7 +13,7 @@ import java.util.List;
  * Date: 2018/11/27
  * Time: 22:51
  */
-@ControllerAdvice
+@ControllerAdvice(basePackages = "com.example.boot")
 public class ExceptionConfig {
 
     @ExceptionHandler(value = BindException.class)
@@ -32,7 +32,7 @@ public class ExceptionConfig {
     }
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public String bindException(Exception e){
+    public String exception(Exception e){
         return e.getMessage();
     }
 }
