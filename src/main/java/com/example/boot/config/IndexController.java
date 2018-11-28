@@ -11,8 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -30,10 +28,6 @@ public class IndexController {
     @Autowired
     private Gson gson;
 
-    @GetMapping("/index")
-    public String index(){
-        return "index";
-    }
 
     @GetMapping("/test")
     @ResponseBody
