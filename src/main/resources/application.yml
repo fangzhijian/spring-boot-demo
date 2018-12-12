@@ -1,3 +1,27 @@
 spring:
   profiles:
-    active: @profileActive@ #获取pom中profile的环境值,profileActive为自定义properties
+    active: @profileActive@
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  gson:
+    serialize-nulls: true
+    date-format: yyyy-MM-dd HH:mm:ss
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+mybatis:
+  type-aliases-package: com.example.boot.model             #开启别名
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl   #日志级别能被logback所控制
+    cache-enabled: true                                     #开启二级缓存
+    map-underscore-to-camel-case: true                    #开启驼峰自动映射
+server:
+  port: 9000
+  tomcat:
+    max-threads: 500
+logging:
+  config: classpath:config/@profileActive@/logback-spring.xml
+

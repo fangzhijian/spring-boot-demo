@@ -2,6 +2,7 @@ package com.example.boot.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,7 @@ import java.util.List;
 @Slf4j
 public class ExceptionConfig {
 
+    //入参验证异常处理
     @ExceptionHandler(value = BindException.class)
     @ResponseBody
     public String bindException(BindException bindException){
@@ -24,13 +26,21 @@ public class ExceptionConfig {
         StringBuilder sb = new StringBuilder();
         int size = allErrors.size();
         for (int i = 0; i <size ; i++) {
-            sb.append(allErrors.get(i).getDefaultMessage());
-            if (i != size-1 && size>1){
+            ObjectError objectError = allErrors.get(i);
+            if (objectError instanceof FieldError){
+                FieldError fieldError = (FieldError) objectError;
+                sb.append(fieldError.getField()).append(fieldError.getDefaultMessage());
+            }else {
+                sb.append(objectError.getDefaultMessage());
+            }
+            if (i != size-1){
                 sb.append("、");
             }
         }
         return sb.toString();
     }
+
+    //系统异常验证处理
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public String exception(Exception e){

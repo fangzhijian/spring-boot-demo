@@ -42,6 +42,13 @@ public class IndexController {
         return user;
     }
 
+    @GetMapping("user")
+    @ResponseBody
+    public User user(@Validated  User user){
+        System.out.println(user);
+        return userMapper.getById(1);
+    }
+
     @GetMapping("abc")
     public String abc(RedirectAttributes redirectAttributes){
         redirectAttributes.addAttribute("id",3);
