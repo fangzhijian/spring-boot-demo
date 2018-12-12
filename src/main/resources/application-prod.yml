@@ -1,15 +1,45 @@
 config:
   path: classpath:config/prod
 
-mybatis:
-  type-aliases-package: com.example.boot.model
-  configuration:
-    map-underscore-to-camel-case: true
 spring:
-  mvc:
-    static-path-pattern: /static/**
-  gson:
-    serialize-nulls: true
-    date-format: yyyy-MM-dd HH:mm:ss
-server:
-  port: 9000
+  redis:
+    sentinel:
+      master: mymaster
+      nodes: 10.0.0.43:26379,10.0.0.47:26379,10.0.0.47:26380
+    password: tc*7F8Cc
+    jedis:
+      pool:
+        max-active: 600         #连接池最大连接数（使用负值表示没有限制)
+        max-wait: 3000          #连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 100           #连接池中的最大空闲连接
+        min-idle: 5             #连接池中的最小空闲连接
+    timeout: 3000               #连接超时时间（毫秒）
+    database: 8
+
+
+  datasource:
+    druid:
+      #用户配置
+      url: jdbc:mysql://10.0.0.1:3306/club?characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false
+      username: root
+      password: -1tsPc}[
+      driver-class-name: com.mysql.jdbc.Driver
+      #连接池配置
+      initial-size: 100
+      max-active: 1000
+      min-idle: 1
+      max-wait: 3000
+      test-while-idle: true
+      validation-query: select 1
+      test-on-return: false
+      test-on-borrow: true
+      time-between-eviction-runs-millis: 12000
+      #监控配置
+      web-stat-filter:    #关闭StatFilter
+        enabled: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: true
+        login-username: root
+        login-password: root

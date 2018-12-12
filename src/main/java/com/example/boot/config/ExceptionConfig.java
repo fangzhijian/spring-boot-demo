@@ -1,11 +1,11 @@
 package com.example.boot.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import java.util.List;
 
 /**
@@ -14,6 +14,7 @@ import java.util.List;
  * Time: 22:51
  */
 @ControllerAdvice(basePackages = "com.example.boot")
+@Slf4j
 public class ExceptionConfig {
 
     @ExceptionHandler(value = BindException.class)
@@ -33,6 +34,7 @@ public class ExceptionConfig {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public String exception(Exception e){
+        log.error(e.getMessage(),e);
         return e.getMessage();
     }
 }

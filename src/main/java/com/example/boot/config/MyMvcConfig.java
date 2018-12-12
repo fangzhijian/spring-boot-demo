@@ -1,7 +1,7 @@
 package com.example.boot.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,23 +14,27 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class MyMvcConfig implements WebMvcConfigurer {
 
     @Override
-    public void addViewControllers(@Nullable ViewControllerRegistry registry) {
-        if (registry == null){
-            return;
-        }
+    public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/index").setViewName("index");
     }
 
+    //静态文件映射
     @Override
-    public void addResourceHandlers(@Nullable ResourceHandlerRegistry registry) {
-        if (registry == null){
-            return;
-        }
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/META-INF/resources/")
                 .addResourceLocations("classpath:/resources/")
                 .addResourceLocations("classpath:/templates/");
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
+    }
+
+    //跨域配置
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("*")
+                .allowedOrigins("*")
+                .allowedHeaders("*");
     }
 }
