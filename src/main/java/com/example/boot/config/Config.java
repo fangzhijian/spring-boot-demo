@@ -34,6 +34,7 @@ public class Config {
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
         template.setKeySerializer(stringRedisSerializer);
         template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.afterPropertiesSet();
         return template;
     }
 }

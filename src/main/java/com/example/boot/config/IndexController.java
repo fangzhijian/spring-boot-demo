@@ -4,11 +4,16 @@ import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
 import com.example.boot.model.User;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 2018/10/10 14:21
@@ -31,16 +39,50 @@ public class IndexController {
     private UserMapper userMapper;
     @Autowired
     private Gson gson;
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
+
+    @PostMapping("paramConfig")
+    @ResponseBody
+    public void paramConfig(String paramConfig){
+        List<ParamConfig> paramConfigs = gson.fromJson(paramConfig,
+                new TypeToken<List<ParamConfig>>(){}.getType());
+        System.out.println(paramConfigs.size());
+        Map<String,ParamConfig> map = new HashMap<>();
+        for (ParamConfig param:paramConfigs){
+            map.put(param.getKey().toString(),param);
+        }
+        redisTemplate.opsForHash().putAll("club:manage:config",map);
+
+
+    }
+
+    @PostMapping("appConfig")
+    @ResponseBody
+    public void appConfig(String appConfig){
+        Map<Object,Object> map = gson.fromJson(appConfig,
+                new TypeToken<Map<Object,Object>>(){}.getType());
+        System.out.println(map);
+        redisTemplate.opsForHash().putAll("club:app:manage",map);
+    }
 
     @GetMapping("/test")
     @ResponseBody
-    public Object test(){
+    @Cacheable(cacheNames = "user",key = "#id")
+    public User test(Integer id){
         log.info(body.getName());
-        User user = userMapper.getById(1);
-        user.setName(null);
-        return user;
+        return userMapper.getById(id);
     }
+
+    @GetMapping("/test2")
+    @ResponseBody
+    @Cacheable(cacheNames = "test",key = "#root.method")
+    public String testABC(){
+        return "你好啊";
+    }
+
+
 
     @GetMapping("user")
     @ResponseBody
@@ -57,17 +99,6 @@ public class IndexController {
         return "redirect:efg";
     }
 
-    @GetMapping("efg")
-    @ResponseBody
-    public User efg(@Validated User user){
-        return user;
-    }
-
-    @GetMapping("hij")
-    @ResponseBody
-    public User hij(String userJson){
-        return gson.fromJson(userJson,User.class);
-    }
 
     @RequestMapping(value = "upload",method =RequestMethod.POST)
     @ResponseBody
