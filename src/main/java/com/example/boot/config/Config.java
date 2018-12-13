@@ -5,11 +5,17 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Repository;
+
+import java.time.Duration;
 
 /**
  * 2018/10/10 15:40
@@ -36,5 +42,17 @@ public class Config {
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.afterPropertiesSet();
         return template;
+    }
+
+    //spring缓存使用Redis
+    @Bean
+    public RedisCacheManager redisCacheManager(RedisTemplate<String,Object> redisTemplate,RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                //使用RedisTemplate的Jackson序列化
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisTemplate.getValueSerializer()))
+                //过期时间12小时
+                .entryTtl(Duration.ofHours(12));
+        return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
     }
 }

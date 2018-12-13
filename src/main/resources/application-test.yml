@@ -15,11 +15,6 @@ spring:
         min-idle: 5             #连接池中的最小空闲连接
     timeout: 3000               #连接超时时间（毫秒）
     database: 8
-  cache:
-    type: redis
-    redis:
-      use-key-prefix: true
-      time-to-live: 43200000   #12小时
 
   datasource:
     druid:
