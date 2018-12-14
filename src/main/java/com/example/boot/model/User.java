@@ -19,9 +19,9 @@ public class User implements Serializable{
     @NotNull
     @Max(value = 3,message = "id长度不能超过3")
     private Integer id;
-    @Pattern(regexp = "\\d*@.*\\.com")
-    @NotNull(message = "name不能为空")
+//    @Pattern(regexp = "\\d*@.*\\.com")
+    @NotNull
     private String name;
-    @NotNull(message = "不能为空")
+//    @NotNull(message = "不能为空")
     private Date createTime;
 }

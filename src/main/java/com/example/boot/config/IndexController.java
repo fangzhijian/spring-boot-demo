@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +37,7 @@ import java.util.Map;
  */
 @Controller
 @Slf4j
+@Validated
 public class IndexController {
 
     @Autowired
@@ -84,9 +91,10 @@ public class IndexController {
 
 
 
-    @GetMapping("user")
+    @GetMapping("userCD")
     @ResponseBody
-    public User user(@Validated  User user){
+    public User userAbc(@Validated User user,
+                        @NotBlank(message = "年轻人啊年轻人") String address, @Size(min = 3,max = 5) String abc){
         System.out.println(user);
         return userMapper.getById(1);
     }
@@ -102,7 +110,11 @@ public class IndexController {
 
     @RequestMapping(value = "upload",method =RequestMethod.POST)
     @ResponseBody
-    public Integer upload(@RequestParam(required = false,value = "groupQrCode")MultipartFile groupQrCode,Integer id){
+    public Integer upload(@RequestParam MultipartFile groupQrCode,
+                          @NotNull @Range(min = 3,max = 6) Integer id,
+                          @NotBlank @Size(max = 3) String name
+                      ,@RequestParam String[] strings
+                           ){
         if (groupQrCode != null){
             System.out.println(groupQrCode.isEmpty());
         }

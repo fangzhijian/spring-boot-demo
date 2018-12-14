@@ -6,11 +6,33 @@
     <script type="application/javascript" th:src="@{/static/js/jquery-1.9.1.js}"></script>
     <script type="application/javascript">
         $(function () {
-        })
+            $("#upload").click(function () {
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    cache: false,
+                    data: new FormData($('#uploadForm')[0]),
+                    processData: false,
+                    contentType: false
+                }).done(function(res) {
+                    alert(res)
+                }).fail(function(res) {
+                    alert(res)
+                });
+
+            }) ;
+        });
     </script>
 </head>
 <body>
         <h1>index</h1>
         <img th:src="@{/static/img/IMG_1459.JPG}" class="demo">
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label>狗肉</label><input type="text" name="name">
+            <label>狗肉</label><input type="text" name="id">
+            <input type="file" name="groupQrCode"/>
+            <button id="upload" type="button">upload</button>
+        </form>
 </body>
 </html>
