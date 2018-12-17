@@ -13,9 +13,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * 2018/10/10 15:40
@@ -55,4 +62,24 @@ public class Config {
                 .entryTtl(Duration.ofHours(12));
         return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
     }
+    @Bean
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory){
+        RestTemplate restTemplate = new RestTemplate(factory);
+        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
+        for (HttpMessageConverter<?> httpMessageConverter:messageConverters){
+            if (httpMessageConverter instanceof StringHttpMessageConverter){
+                ((StringHttpMessageConverter) httpMessageConverter).setDefaultCharset(Charset.forName("UTF-8"));
+            }
+        }
+        return restTemplate;
+    }
+
+    @Bean
+    public ClientHttpRequestFactory simpleClientHttpRequestFactory(){
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(5000);//单位为ms
+        factory.setConnectTimeout(5000);//单位为ms
+        return factory;
+    }
+
 }

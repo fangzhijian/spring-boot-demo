@@ -91,11 +91,12 @@ public class IndexController {
 
 
 
-    @GetMapping("userCD")
+    @RequestMapping("userCD")
     @ResponseBody
-    public User userAbc(@Validated User user,
+    public User userAbc(@Validated User user,String json,
                         @NotBlank(message = "年轻人啊年轻人") String address, @Size(min = 3,max = 5) String abc){
         System.out.println(user);
+        System.out.println(json);
         return userMapper.getById(1);
     }
 

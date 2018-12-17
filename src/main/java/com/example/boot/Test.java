@@ -20,11 +20,11 @@ public class Test {
         User user = new User();
         user.setId(2);
         user.setName("大壳");
-        user.setCreateTime(new Date());
+//        user.setCreateTime(new Date());
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         String userJson = gson.toJson(user);
         System.out.println(userJson);
-        String path = "http://localhost:8888/api/content?id=200190";
+        String path = "http://localhost:8080/index?user="+gson.toJson(user);
 //        String path = "http://localhost:8888/api/activity/detailMiniApp?detail_id=417";
 //        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
 //        String path = "http://localhost:9000/hij?userJson="+userJson;

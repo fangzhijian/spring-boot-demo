@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
+
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,17 +32,11 @@ public class BootApplicationTests {
 	private UserMapper userMapper;
 	@Value("${body.name}")
 	private String name;
+	@Autowired
+	private RestTemplate restTemplate;
 	@Test
 	public void contextLoads() throws SQLException {
-		System.out.println(name);
-		ExecutorService executorService = Executors.newScheduledThreadPool(5);
-		executorService.submit(new Runnable() {
-			@Override
-			public void run() {
-				System.out.println(2342);
-			}
-		});
-
+		System.out.println(restTemplate.getForObject("http://localhost:8888/api/appManage/getInfo",String.class));
 	}
 
 }

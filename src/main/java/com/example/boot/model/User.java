@@ -23,5 +23,5 @@ public class User implements Serializable{
     @NotNull
     private String name;
 //    @NotNull(message = "不能为空")
-    private Date createTime;
+//    private Date createTime;
 }
