@@ -13,7 +13,8 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 mybatis:
-  type-aliases-package: com.example.boot.model             #开启别名
+  #开启多个别名
+  type-aliases-package: com.example.boot.model;com.example.boot.openResult
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl   #日志级别能被logback所控制
     cache-enabled: true                                     #开启二级缓存
