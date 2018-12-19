@@ -6,4 +6,18 @@
     <select id="getById" resultType="user">
         SELECT * FROM user WHERE id = #{id}
     </select>
+    
+    <select id="getViewCountList" resultType="activity">
+        SELECT b.agency_id,sum(b.viw_count) as view_count FROM js_club_activity_list a
+        LEFT JOIN js_club_activity_list b on b.agency_id = a.id
+        WHERE a.special_type =1 and b.special_type =2
+        GROUP BY b.agency_id;
+    </select>
+
+    <update id="updateViewCount">
+        <foreach collection="list" separator=";" item="item">
+            UPDATE js_club_activity_list SET viw_count = #{item.viewCount}
+            where id = #{item.agencyId}
+        </foreach>
+    </update>
 </mapper>

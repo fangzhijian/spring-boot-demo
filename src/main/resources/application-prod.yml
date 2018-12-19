@@ -19,7 +19,7 @@ spring:
   datasource:
     druid:
       #用户配置
-      url: jdbc:mysql://10.0.0.1:3306/club?characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false
+      url: jdbc:mysql://10.0.0.43:3306/club?characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull
       username: root
       password: -1tsPc}[
       driver-class-name: com.mysql.jdbc.Driver

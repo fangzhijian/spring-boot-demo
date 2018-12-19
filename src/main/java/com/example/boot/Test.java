@@ -24,8 +24,8 @@ public class Test {
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         String userJson = gson.toJson(user);
         System.out.println(userJson);
-        String path = "http://localhost:8080/index?user="+gson.toJson(user);
-//        String path = "http://localhost:8888/api/activity/detailMiniApp?detail_id=417";
+//        String path = "http://localhost:8080/index?user="+gson.toJson(user);
+        String path = "http://localhost:8888/api/specialRailway/agencyClubList?activityId=1122";
 //        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
 //        String path = "http://localhost:9000/hij?userJson="+userJson;
         URL url = new URL(HttpUtil.getEncodeUrl(path));

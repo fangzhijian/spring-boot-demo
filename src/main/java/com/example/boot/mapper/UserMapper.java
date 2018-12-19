@@ -1,7 +1,10 @@
 package com.example.boot.mapper;
 
+import com.example.boot.model.Activity;
 import com.example.boot.model.User;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 2018/10/10 16:25
@@ -11,4 +14,8 @@ import org.springframework.stereotype.Repository;
 public interface UserMapper {
 
     User getById(Integer id);
+
+    List<Activity> getViewCountList();
+
+    void updateViewCount(List<Activity> list);
 }
