@@ -2,7 +2,9 @@ package com.example.boot.config;
 
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
+import com.example.boot.model.ExcelData;
 import com.example.boot.model.User;
+import com.example.boot.util.ExcelUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.outdoor.club.model.admin.ParamConfig;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -82,11 +86,42 @@ public class IndexController {
         return userMapper.getById(id);
     }
 
-    @GetMapping("/test2")
-    @ResponseBody
-    @Cacheable(cacheNames = "test",key = "#root.method")
-    public String testABC(){
-        return "你好啊";
+    @RequestMapping("/test2")
+    public void test2(HttpServletResponse response){
+
+        List<User> list= new ArrayList<>();
+        User user1 = new User(1,"小明","2018-12-10 12:12:12");
+        User user2 = new User(3,"中明","2018-12-11 12:12:12");
+        User user3 = new User(3,"大明","2018-12-12 12:12:12");
+        list.add(user1);
+        list.add(user2);
+        list.add(user3);
+        ExcelData data = new ExcelData();
+        data.setName("hello");
+        List<String> titles = new ArrayList<>();
+        titles.add("排序");
+        titles.add("主键");
+        titles.add("姓名");
+        titles.add("创建时间");
+        data.setTitles(titles);
+
+        List<List<Object>> rows = new ArrayList<>();
+
+        for (int i = 0; i <list.size() ; i++) {
+            List<Object> row = new ArrayList<>();
+            User user = list.get(i);
+            row.add(i+1);
+            row.add(user.getId());
+            row.add(user.getName());
+            row.add(user.getCreateTime());
+            rows.add(row);
+        }
+        data.setRows(rows);
+        try{
+            ExcelUtils.exportExcel(response,"abc",data);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

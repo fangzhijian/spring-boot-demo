@@ -50,6 +50,15 @@ public class BootApplicationTests {
 //		UPDATE js_club a SET cl_artno = (SELECT count(1) FROM js_article WHERE cl_id = a.id);
 		//活动代理专线数
 //		UPDATE js_club a SET cl_ac_ag_no = (SELECT count(1) FROM js_club_activity_list WHERE club_id = a.id and special_type = 2);
+		//活动自营数
+//		UPDATE js_club a SET cl_ac_self_no = (SELECT count(1) FROM js_club_activity_list WHERE club_id = a.id and special_type = 0);
+		//活动总数
+//		UPDATE js_club a SET cl_ac_no = (SELECT count(1) FROM js_club_activity_list WHERE club_id = a.id );
+		//添加俱乐部的创建时间和完善时间
+//		UPDATE js_club SET createtime = cl_regist;
+//		UPDATE js_club SET perfect_time = cl_regist WHERE cl_idnumber IS NOT NULL;
+		//设置之前的俱乐部身份默认为店主
+//		UPDATE js_club SET member_type = 2 ;
 	}
 
 }

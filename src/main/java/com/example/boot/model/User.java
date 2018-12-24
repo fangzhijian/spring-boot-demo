@@ -1,6 +1,10 @@
 package com.example.boot.model;
 
+import com.example.boot.util.RegexpTemplate;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.apache.ibatis.type.Alias;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
@@ -14,6 +18,9 @@ import java.util.Date;
  */
 @Data
 @Alias("user")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable{
 
     @NotNull
@@ -23,5 +30,6 @@ public class User implements Serializable{
     @NotNull
     private String name;
 //    @NotNull(message = "不能为空")
-//    private Date createTime;
+    @Pattern(regexp = RegexpTemplate.DATE_ALL,message = "格式不正确")
+    private String createTime;
 }
