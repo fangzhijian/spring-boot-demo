@@ -91,7 +91,7 @@ public class IndexController {
 
         List<User> list= new ArrayList<>();
         User user1 = new User(1,"小明","2018-12-10 12:12:12");
-        User user2 = new User(3,"中明","2018-12-11 12:12:12");
+        User user2 = new User(2,"中明","2018-12-11 12:12:12");
         User user3 = new User(3,"大明","2018-12-12 12:12:12");
         list.add(user1);
         list.add(user2);
