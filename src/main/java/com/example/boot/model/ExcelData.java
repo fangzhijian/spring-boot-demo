@@ -14,6 +14,6 @@ public class ExcelData implements Serializable{
 
     private String[] titles;    //表头
     private List<List<Object>> rows; //数据
-    private String name; //页签名称
+    private String name = "Sheet1"; //页签名称
 
 }
