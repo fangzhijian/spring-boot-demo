@@ -25,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -98,8 +97,8 @@ public class IndexController {
         list.add(user3);
         ExcelData data = new ExcelData();
         data.setName("hello");
-        String[] titles = {"排序","主键","姓名","创建时间"};
-        data.setTitles(titles);
+        String[] columnNames = {"排序","主键","姓名","创建时间"};
+        data.setColumnNames(columnNames);
 
         List<List<Object>> rows = new ArrayList<>();
 

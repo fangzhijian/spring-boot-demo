@@ -59,9 +59,9 @@ public class ExcelUtils {
      * 表显示字段
      */
     private static void writeExcel(XSSFWorkbook wb, Sheet sheet, ExcelData data) {
-        writeTitlesToExcel(wb, sheet, data.getTitles());
+        writeTitlesToExcel(wb, sheet, data.getColumnNames());
         writeRowsToExcel(wb, sheet, data.getRows());
-        autoSizeColumns(sheet, data.getTitles().length + 1);
+        autoSizeColumns(sheet, data.getColumnNames().length + 1);
     }
     /**
      * 设置表头
