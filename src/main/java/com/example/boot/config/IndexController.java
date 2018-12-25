@@ -96,7 +96,6 @@ public class IndexController {
         list.add(user2);
         list.add(user3);
         ExcelData data = new ExcelData();
-        data.setName("hello");
         String[] columnNames = {"排序","主键","姓名","创建时间"};
         data.setColumnNames(columnNames);
 
