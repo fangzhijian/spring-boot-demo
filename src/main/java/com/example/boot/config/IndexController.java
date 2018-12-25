@@ -98,11 +98,7 @@ public class IndexController {
         list.add(user3);
         ExcelData data = new ExcelData();
         data.setName("hello");
-        List<String> titles = new ArrayList<>();
-        titles.add("排序");
-        titles.add("主键");
-        titles.add("姓名");
-        titles.add("创建时间");
+        String[] titles = {"排序","主键","姓名","创建时间"};
         data.setTitles(titles);
 
         List<List<Object>> rows = new ArrayList<>();

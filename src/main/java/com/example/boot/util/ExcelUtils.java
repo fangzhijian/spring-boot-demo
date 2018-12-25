@@ -14,8 +14,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.Color;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.List;
@@ -25,6 +23,7 @@ import java.util.List;
  */
 public class ExcelUtils {
 
+
     /**
      * 使用浏览器选择路径下载
      */
@@ -32,26 +31,20 @@ public class ExcelUtils {
         // 告诉浏览器用什么软件可以打开此文件
         response.setHeader("content-Type", "application/vnd.ms-excel");
         // 下载文件的默认名称
-        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName + ".xls", "utf-8"));
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName + ".xlsx", "utf-8"));
         exportExcel(data, response.getOutputStream());
     }
 
-    public static int generateExcel(ExcelData excelData, String path) throws Exception {
-        File f = new File(path);
-        FileOutputStream out = new FileOutputStream(f);
-        return exportExcel(excelData, out);
-    }
 
-    private static int exportExcel(ExcelData data, OutputStream out) throws Exception {
+    private static void exportExcel(ExcelData data, OutputStream out) throws Exception {
         XSSFWorkbook wb = new XSSFWorkbook();
-        int rowIndex = 0;
         try {
             String sheetName = data.getName();
             if (null == sheetName) {
                 sheetName = "Sheet1";
             }
             XSSFSheet sheet = wb.createSheet(sheetName);
-            rowIndex = writeExcel(wb, sheet, data);
+            writeExcel(wb, sheet, data);
             wb.write(out);
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,27 +52,22 @@ public class ExcelUtils {
             //此处需要关闭 wb 变量
             out.close();
         }
-        return rowIndex;
     }
 
 
     /**
      * 表显示字段
      */
-    private static int writeExcel(XSSFWorkbook wb, Sheet sheet, ExcelData data) {
-        int rowIndex = 0;
-        rowIndex = writeTitlesToExcel(wb, sheet, data.getTitles());
-        rowIndex = writeRowsToExcel(wb, sheet, data.getRows(), rowIndex);
-        autoSizeColumns(sheet, data.getTitles().size() + 1);
-        return rowIndex;
+    private static void writeExcel(XSSFWorkbook wb, Sheet sheet, ExcelData data) {
+        writeTitlesToExcel(wb, sheet, data.getTitles());
+        writeRowsToExcel(wb, sheet, data.getRows());
+        autoSizeColumns(sheet, data.getTitles().length + 1);
     }
     /**
      * 设置表头
      *
      */
-    private static int writeTitlesToExcel(XSSFWorkbook wb, Sheet sheet, List<String> titles) {
-        int rowIndex = 0;
-        int colIndex = 0;
+    private static void writeTitlesToExcel(XSSFWorkbook wb, Sheet sheet, String[] titles) {
         Font titleFont = wb.createFont();
         //设置字体
         titleFont.setFontName("simsun");
@@ -100,24 +88,22 @@ public class ExcelUtils {
         titleStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
         titleStyle.setFont(titleFont);
         setBorder(titleStyle, BorderStyle.THIN, new XSSFColor(new Color(0, 0, 0)));
-        Row titleRow = sheet.createRow(rowIndex);
+        Row titleRow = sheet.createRow(0);
         titleRow.setHeightInPoints(25);
-        colIndex = 0;
+        int colIndex = 0;
         for (String field : titles) {
             Cell cell = titleRow.createCell(colIndex);
             cell.setCellValue(field);
             cell.setCellStyle(titleStyle);
             colIndex++;
         }
-        rowIndex++;
-        return rowIndex;
     }
 
     /**
      * 设置内容
      *
      */
-    private static int writeRowsToExcel(XSSFWorkbook wb, Sheet sheet, List<List<Object>> rows, int rowIndex) {
+    private static void writeRowsToExcel(XSSFWorkbook wb, Sheet sheet, List<List<Object>> rows) {
         int colIndex;
         Font dataFont = wb.createFont();
         dataFont.setFontName("simsun");
@@ -129,6 +115,7 @@ public class ExcelUtils {
         dataStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
         dataStyle.setFont(dataFont);
         setBorder(dataStyle, BorderStyle.THIN, new XSSFColor(new Color(0, 0, 0)));
+        int rowIndex = 1;
         for (List<Object> rowData : rows) {
             Row dataRow = sheet.createRow(rowIndex);
             dataRow.setHeightInPoints(25);
@@ -145,7 +132,6 @@ public class ExcelUtils {
             }
             rowIndex++;
         }
-        return rowIndex;
     }
 
     /**

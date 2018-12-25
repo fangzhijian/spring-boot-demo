@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class ExcelData implements Serializable{
 
-    private List<String> titles;    //表头
+    private String[] titles;    //表头
     private List<List<Object>> rows; //数据
     private String name; //页签名称
 
