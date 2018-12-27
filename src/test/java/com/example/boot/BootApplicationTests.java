@@ -4,7 +4,12 @@ import com.example.boot.config.BootApplication;
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Activity;
 import com.example.boot.model.User;
+import com.example.boot.model.kuGou.KuGouJson;
+import com.example.boot.model.kuGou.MusicBody;
+import com.example.boot.model.kuGou.MusicDetail;
+import com.example.boot.model.kuGou.MusicList;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +64,37 @@ public class BootApplicationTests {
 //		UPDATE js_club SET perfect_time = cl_regist WHERE cl_idnumber IS NOT NULL;
 		//设置之前的俱乐部身份默认为店主
 //		UPDATE js_club SET member_type = 2 ;
+	}
+
+	@Test
+	public void kuGouMusicList(){
+		String keyword="9420";
+		Integer pageNumber = 1;
+		Integer pageSize = 5;
+		String musicUrl = "http://songsearch.kuGou.com/song_search_v2?keyword={keyword}&page={pageNumber}&pagesize={pageSize}&userid=-1&clientver=&platform=WebFilter&tag=em&filter=2&iscorrection=1&privilege_filter=0";
+		String musicList = restTemplate.getForObject(musicUrl,String.class,keyword,pageNumber,pageSize);
+		KuGouJson<MusicList> json = gson.fromJson(musicList,
+				new TypeToken<KuGouJson<MusicList>>(){}.getType());
+		if (json != null && json.getStatus() == 1){
+			int index = 1;
+			for (MusicBody musicBody:json.getData().getLists()){
+				kuGouMusicDetail(musicBody.getFileHash(),musicBody.getAlbumID(),index);
+				index++;
+			}
+		}
+	}
+	public void  kuGouMusicDetail(String hash,String albumId,Integer index){
+		String musicDetailUrl = "http://www.kuGou.com/yy/index.php?r=play/getdata&hash={hash}&album_id={albumId}";
+		String result = restTemplate.getForObject(musicDetailUrl,String.class,hash,albumId);
+		KuGouJson<MusicDetail> json = gson.fromJson(result,
+				new TypeToken<KuGouJson<MusicDetail>>(){}.getType());
+		if (json != null && json.getStatus() == 1){
+			MusicDetail data = json.getData();
+			if (index == 1){
+				System.out.println(data.getLyrics());
+			}
+			System.out.println(data.getAudio_name()+"\t\t"+data.getPlay_url());
+		}
 	}
 
 }
