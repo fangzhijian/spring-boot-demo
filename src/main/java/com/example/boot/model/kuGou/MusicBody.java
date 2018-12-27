@@ -18,7 +18,7 @@ public class MusicBody implements Serializable{
      */
     private String FileHash;        //标准音质文件hash,用于请求歌曲详情
     private String SingerName;      //歌手名字(艺名)
-    private String SongName;        //歌曲名
+    private String SongName;        //歌曲名,包含h5标签,如斜体、加粗
     private String AlbumName;       //唱片集名称
     private String ExtName;         //音乐格式
     private Long FileSize;          //歌曲大小,单位b
