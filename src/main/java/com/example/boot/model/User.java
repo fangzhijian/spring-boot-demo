@@ -32,4 +32,5 @@ public class User implements Serializable{
 //    @NotNull(message = "不能为空")
     @Pattern(regexp = RegexpTemplate.DATE_ALL,message = "格式不正确")
     private String createTime;
+    private Integer age;//年龄
 }

@@ -20,4 +20,8 @@
             where id = #{item.agencyId}
         </foreach>
     </update>
+
+    <update id="updateUser"  >
+        UPDATE user SET age = age +  #{age} where id = 1
+    </update>
 </mapper>
