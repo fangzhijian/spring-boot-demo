@@ -25,7 +25,7 @@ public class Test {
         String userJson = gson.toJson(user);
         System.out.println(userJson);
 //        String path = "http://localhost:8080/index?user="+gson.toJson(user);
-        String path = "http://localhost:8888/api/articlelist?clId=1099&sizePerPage=10&actType=list&arIssue=1&nowPageNo=1";
+        String path = "http://localhost:8888/api/club/searchMusicDetail?hash=14B802078B0AFD214D27AE744FF64F85&albumId=8238038";
 //        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
 //        String path = "http://localhost:9000/hij?userJson="+userJson;
         URL url = new URL(HttpUtil.getEncodeUrl(path));
