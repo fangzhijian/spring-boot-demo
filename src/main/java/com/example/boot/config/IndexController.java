@@ -87,9 +87,10 @@ public class IndexController {
         User user = new User();
         user.setAge(id);
         userMapper.updateUser(user);
-        System.out.println(10/0);
         log.info(user.getAge().toString());
-        return userMapper.getById(id);
+        User byId = userMapper.getById(id);
+        byId.setId(null);
+        return byId;
     }
 
     @RequestMapping("/test2")
