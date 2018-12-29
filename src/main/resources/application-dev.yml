@@ -26,7 +26,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       #连接池配置
       connection-init-sqls: set names utf8mb4
-      initial-size: 100
+      initial-size: 5
       max-active: 1000
       min-idle: 1
       max-wait: 3000
@@ -39,9 +39,6 @@ spring:
       web-stat-filter:    #关闭StatFilter
         enabled: false
       stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: true
-        login-username: root
-        login-password: root
+        enabled: false
+
 
