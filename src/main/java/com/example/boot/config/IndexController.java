@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,12 +80,14 @@ public class IndexController {
 
     @GetMapping("/test")
     @ResponseBody
-    @Cacheable(cacheNames = "user",key = "#id")
+    @Transactional
+//    @Cacheable(cacheNames = "user",key = "#id")
     public User test(Integer id){
         log.info(body.getName());
         User user = new User();
         user.setAge(id);
         userMapper.updateUser(user);
+        System.out.println(10/0);
         log.info(user.getAge().toString());
         return userMapper.getById(id);
     }

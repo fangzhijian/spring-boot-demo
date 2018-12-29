@@ -15,6 +15,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 mybatis:
+  mapper-locations: mybatis/**/*Mapper.xml
   #开启多个别名
   type-aliases-package: com.example.boot.model;com.example.boot.openResult
   configuration:
