@@ -22,7 +22,7 @@ spring:
       url: jdbc:mysql://10.0.0.43:3306/club?characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull
       username: root
       password: -1tsPc}[
-      driver-class-name: com.mysql.jdbc.Driver
+      driver-class-name: com.mysql.cj.jdbc.Driver
       #连接池配置
       connection-init-sqls: set names utf8mb4
       initial-size: 100
