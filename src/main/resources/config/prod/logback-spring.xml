@@ -44,7 +44,7 @@
 
         </rollingPolicy>
         <encoder>
-            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss}) %red(%-5level) %logger{5} %cyan(-%msg%n)</pattern>
+            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldRed(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 
@@ -71,7 +71,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss}) %yellow(%-5level) %logger{5} %cyan(-%msg%n)</pattern>
+            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldYellow(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 
@@ -96,7 +96,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss}) %green(%-5level) %logger{5} %cyan(-%msg%n)</pattern>
+            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldGreen(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 

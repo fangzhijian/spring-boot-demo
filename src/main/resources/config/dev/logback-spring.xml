@@ -15,7 +15,7 @@
     <appender name="DEV" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 对日志进行格式化,给控制台上颜色 -->
         <encoder>
-            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss}) %green(%-5level) %logger{5} %cyan(-%msg%n)</pattern>
+            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldGreen(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 
