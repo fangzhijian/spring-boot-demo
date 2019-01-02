@@ -83,11 +83,11 @@ public class Config {
     public RestTemplate restTemplate(ClientHttpRequestFactory factory){
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-        for (HttpMessageConverter<?> httpMessageConverter:messageConverters){
-            if (httpMessageConverter instanceof StringHttpMessageConverter){
-                ((StringHttpMessageConverter) httpMessageConverter).setDefaultCharset(Charset.forName("UTF-8"));
+        messageConverters.forEach((x)->{
+            if (x instanceof StringHttpMessageConverter){
+                ((StringHttpMessageConverter) x).setDefaultCharset(Charset.forName("UTF-8"));
             }
-        }
+        });
         return restTemplate;
     }
 
