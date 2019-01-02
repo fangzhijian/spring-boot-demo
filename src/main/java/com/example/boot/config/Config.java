@@ -106,7 +106,7 @@ public class Config {
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        //支持jdk8时间格式
+        //支持jdk8时间格式分别为yyyy-MM-dd HH:mm:ss,yyyy-MM-dd,HH:mm:ss
         javaTimeModule.addSerializer(LocalDateTime.class,new LocalDateTimeSerializer(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
         javaTimeModule.addDeserializer(LocalDateTime.class,new LocalDateTimeDeserializer(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
         javaTimeModule.addSerializer(LocalDate.class,new LocalDateSerializer(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
