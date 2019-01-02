@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -97,9 +99,11 @@ public class IndexController {
     public void test2(HttpServletResponse response){
 
         List<User> list= new ArrayList<>();
-        User user1 = new User(1,"小明","2018-12-10 12:12:12",10);
-        User user2 = new User(2,"中明","2018-12-11 12:12:12",11);
-        User user3 = new User(3,"大明","2018-12-12 12:12:12",12);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Date now = new Date();
+        User user1 = new User(1,"小明",localDateTime,10,now);
+        User user2 = new User(2,"中明",localDateTime,11,now);
+        User user3 = new User(3,"大明",localDateTime,12,now);
         list.add(user1);
         list.add(user2);
         list.add(user3);
@@ -159,5 +163,17 @@ public class IndexController {
         return id;
     }
 
+    @RequestMapping("test5")
+    @ResponseBody
+    public User test5(@RequestBody User user){
+        return user;
+    }
 
+    @RequestMapping("test6")
+    @ResponseBody
+    public User test6(String name){
+        User user = new User().setCreateTime(LocalDateTime.now()).setName(name);
+        userMapper.insertUser(user);
+        return user;
+    }
 }

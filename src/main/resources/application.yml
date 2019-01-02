@@ -11,10 +11,6 @@ spring:
   gson:
     serialize-nulls: true
     date-format: yyyy-MM-dd HH:mm:ss
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
-    default-property-inclusion: non_null
 mybatis:
   mapper-locations: mybatis/**/*Mapper.xml
   #开启多个别名

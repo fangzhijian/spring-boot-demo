@@ -24,4 +24,8 @@
     <update id="updateUser"  >
         UPDATE user SET age = age +  #{age} where id = 1
     </update>
+    
+    <insert id="insertUser">
+        INSERT INTO user(name,create_time)VALUES (#{name},#{createTime})
+    </insert>
 </mapper>

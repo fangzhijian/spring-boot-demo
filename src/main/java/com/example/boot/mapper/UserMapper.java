@@ -20,4 +20,6 @@ public interface UserMapper {
     void updateViewCount(List<Activity> list);
 
     void updateUser(User user);
+
+    void insertUser(User user);
 }

@@ -97,4 +97,11 @@ public class BootApplicationTests {
 		}
 	}
 
+	@Test
+	public void test5(){
+		User user = new User().setId(1).setAge(2).setName("猪大肠");
+		String s = restTemplate.postForObject("http://localhost:9000/test5",user, String.class);
+		System.out.println(s);
+	}
+
 }
