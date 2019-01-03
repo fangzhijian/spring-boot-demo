@@ -125,7 +125,8 @@ public class Config {
 
     }
 
-
+    //Converter无法使用lambda注入bean,当前spring5.1.3
+    //入参yyyy-MM-dd HH:mm:ss接收Date
     @Bean
     public Converter<String,Date> dateConverter(){
         return new Converter<String, Date>() {
@@ -144,7 +145,7 @@ public class Config {
         };
     }
 
-
+    //入参yyyy-MM-dd HH:mm:ss接收LocalDateTime
     @Bean
     public Converter<String, LocalDateTime> LocalDateTimeConvert() {
         return new Converter<String, LocalDateTime>() {
@@ -159,6 +160,7 @@ public class Config {
         };
     }
 
+    //入参yyyy-MM-dd接收为LocalDate
     @Bean
     public Converter<String,LocalDate> localDateConverter(){
         return new Converter<String, LocalDate>() {
@@ -172,7 +174,7 @@ public class Config {
             }
         };
     }
-
+    //入参HH:mm:ss接收为LocalTime
     @Bean
     public Converter<String,LocalTime> localTimeConverter(){
         return new Converter<String, LocalTime>() {

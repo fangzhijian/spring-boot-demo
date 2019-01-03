@@ -180,7 +180,7 @@ public class IndexController {
 
     @RequestMapping("test7")
     @ResponseBody
-    public Date test7(Date date,@RequestParam(required = false) LocalDateTime dateTime){
+    public Date test7(Date date,@RequestParam LocalDateTime dateTime){
         System.out.println(dateTime);
         return date;
     }

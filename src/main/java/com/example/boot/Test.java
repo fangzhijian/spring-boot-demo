@@ -25,9 +25,10 @@ public class Test {
         String userJson = gson.toJson(user);
         System.out.println(userJson);
 //        String path = "http://localhost:8080/index?user="+gson.toJson(user);
-        String path = "http://localhost:8888/api/articlelist?clId=1099&nowPageNo=1&sizePerPage=3";
+//        String path = "http://localhost:8888/api/articlelist?clId=1099&nowPageNo=1&sizePerPage=3";
 //        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
 //        String path = "http://localhost:9000/hij?userJson="+userJson;
+        String path = "http://localhost:9000/test7?date=2019-01-03 17:25:58";
         URL url = new URL(HttpUtil.getEncodeUrl(path));
         long start = System.currentTimeMillis();
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
