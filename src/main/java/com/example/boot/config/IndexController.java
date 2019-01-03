@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -175,5 +176,12 @@ public class IndexController {
         User user = new User().setCreateTime(LocalDateTime.now()).setName(name);
         userMapper.insertUser(user);
         return user;
+    }
+
+    @RequestMapping("test7")
+    @ResponseBody
+    public Date test7(Date date,@RequestParam(required = false) LocalDateTime dateTime){
+        System.out.println(dateTime);
+        return date;
     }
 }

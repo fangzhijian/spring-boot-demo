@@ -3,6 +3,7 @@ package com.example.boot.config;
 import com.example.boot.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -16,6 +17,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -28,16 +30,20 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -54,7 +60,7 @@ public class Config {
     //修改RedisTemplate使用jackson序列化
     // redis key值使用String类型,操作hash时map的key值也要使用String
     @Bean(name = "redisTemplate")
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         //使用GenericJackson2可以保存并反序列化java对象
@@ -70,7 +76,7 @@ public class Config {
 
     //spring缓存使用Redis
     @Bean
-    public RedisCacheManager redisCacheManager(RedisTemplate<String,Object> redisTemplate,RedisConnectionFactory redisConnectionFactory) {
+    public RedisCacheManager redisCacheManager(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory redisConnectionFactory) {
         RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 //使用RedisTemplate的Jackson序列化
@@ -79,12 +85,13 @@ public class Config {
                 .entryTtl(Duration.ofHours(12));
         return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
     }
+
     @Bean
-    public RestTemplate restTemplate(ClientHttpRequestFactory factory){
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory) {
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-        messageConverters.forEach((x)->{
-            if (x instanceof StringHttpMessageConverter){
+        messageConverters.forEach((x) -> {
+            if (x instanceof StringHttpMessageConverter) {
                 ((StringHttpMessageConverter) x).setDefaultCharset(Charset.forName("UTF-8"));
             }
         });
@@ -92,7 +99,7 @@ public class Config {
     }
 
     @Bean
-    public ClientHttpRequestFactory simpleClientHttpRequestFactory(){
+    public ClientHttpRequestFactory simpleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setReadTimeout(5000);//单位为ms
         factory.setConnectTimeout(5000);//单位为ms
@@ -100,22 +107,84 @@ public class Config {
     }
 
     @Bean
-    public ObjectMapper objectMapper(){
+    public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         //支持jdk8时间格式分别为yyyy-MM-dd HH:mm:ss,yyyy-MM-dd,HH:mm:ss
-        javaTimeModule.addSerializer(LocalDateTime.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DateUtil.DATE_TIME)));
-        javaTimeModule.addDeserializer(LocalDateTime.class,new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DateUtil.DATE_TIME)));
-        javaTimeModule.addSerializer(LocalDate.class,new LocalDateSerializer(DateTimeFormatter.ofPattern(DateUtil.DATE)));
-        javaTimeModule.addDeserializer(LocalDate.class,new LocalDateDeserializer(DateTimeFormatter.ofPattern(DateUtil.DATE)));
-        javaTimeModule.addSerializer(LocalTime.class,new LocalTimeSerializer(DateTimeFormatter.ofPattern(DateUtil.TIME)));
-        javaTimeModule.addDeserializer(LocalTime.class,new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DateUtil.TIME)));
-        objectMapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule());
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DateUtil.DATE_TIME)));
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DateUtil.DATE_TIME)));
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(DateUtil.DATE)));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DateUtil.DATE)));
+        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(DateUtil.TIME)));
+        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DateUtil.TIME)));
+        objectMapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(new Jdk8Module());
         return objectMapper;
 
+    }
+
+
+    @Bean
+    public Converter<String,Date> dateConverter(){
+        return new Converter<String, Date>() {
+            @Nullable
+            @Override
+            public Date convert(@Nullable String s) {
+                if (!StringUtils.hasText(s)){
+                    return null;
+                }
+                try {
+                    return DateUtil.yyyy_MM_ddHH_mm_ss.parse(s);
+                } catch (ParseException e) {
+                    return null;
+                }
+            }
+        };
+    }
+
+
+    @Bean
+    public Converter<String, LocalDateTime> LocalDateTimeConvert() {
+        return new Converter<String, LocalDateTime>() {
+            @Nullable
+            @Override
+            public LocalDateTime convert(@Nullable String s) {
+                if (!StringUtils.hasText(s)){
+                    return null;
+                }
+                return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(DateUtil.DATE_TIME));
+            }
+        };
+    }
+
+    @Bean
+    public Converter<String,LocalDate> localDateConverter(){
+        return new Converter<String, LocalDate>() {
+            @Nullable
+            @Override
+            public LocalDate convert(@Nullable String s) {
+                if (!StringUtils.hasText(s)){
+                    return null;
+                }
+                return LocalDate.parse(s,DateTimeFormatter.ofPattern(DateUtil.DATE));
+            }
+        };
+    }
+
+    @Bean
+    public Converter<String,LocalTime> localTimeConverter(){
+        return new Converter<String, LocalTime>() {
+            @Nullable
+            @Override
+            public LocalTime convert(@Nullable String s) {
+                if (!StringUtils.hasText(s)){
+                    return null;
+                }
+                return LocalTime.parse(s,DateTimeFormatter.ofPattern(DateUtil.TIME));
+            }
+        };
     }
 
 }
