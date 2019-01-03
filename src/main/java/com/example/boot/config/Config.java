@@ -103,6 +103,7 @@ public class Config {
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 //使用RedisTemplate的Jackson序列化
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisTemplate.getValueSerializer()))
+                .disableCachingNullValues()
                 //过期时间12小时
                 .entryTtl(Duration.ofHours(12));
         return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
