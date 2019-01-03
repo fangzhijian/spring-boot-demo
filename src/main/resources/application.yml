@@ -9,7 +9,6 @@ spring:
   thymeleaf:
     cache: false
   gson:
-    serialize-nulls: true
     date-format: yyyy-MM-dd HH:mm:ss
 mybatis:
   mapper-locations: mybatis/**/*Mapper.xml

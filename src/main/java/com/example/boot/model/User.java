@@ -2,6 +2,10 @@ package com.example.boot.model;
 
 import com.example.boot.util.RegexpTemplate;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +36,8 @@ public class User implements Serializable{
 //    @NotNull(message = "不能为空")
 //    @Pattern(regexp = RegexpTemplate.DATE_ALL,message = "格式不正确")
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
     private Integer age;//年龄
     private Date date = new Date();

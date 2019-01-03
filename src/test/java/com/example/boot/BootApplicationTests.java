@@ -16,17 +16,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BootApplication.class)
@@ -41,6 +38,8 @@ public class BootApplicationTests {
 	private String name;
 	@Autowired
 	private RestTemplate restTemplate;
+	@Autowired
+	private RedisTemplate<String,Object> redisTemplate;
 	@Test
 	public void contextLoads() throws SQLException {
 		System.out.println(restTemplate.getForObject("http://localhost:8888/api/appManage/getInfo",String.class));
@@ -102,6 +101,17 @@ public class BootApplicationTests {
 		User user = new User().setId(1).setAge(2).setName("猪大肠");
 		String s = restTemplate.postForObject("http://localhost:9000/test5",user, String.class);
 		System.out.println(s);
+	}
+	@Test
+	public void test6(){
+		User user = new User().setName("猪小明").setId(3).setAge(null).setCreateTime(LocalDateTime.now());
+		redisTemplate.opsForValue().set("localDateTime",user);
+		Map<Object, Object> hash = redisTemplate.opsForHash().entries("hash");
+		System.out.println(hash);
+		redisTemplate.opsForValue().set("hhh",2);
+//		redisTemplate.opsForValue().increment("hhh",3);
+//		System.out.println(redisTemplate.getExpire("hhh"));
+//		redisTemplate.expire("hhh",20, TimeUnit.SECONDS);
 	}
 
 }
