@@ -10,7 +10,6 @@ import com.example.boot.model.kuGou.MusicDetail;
 import com.example.boot.model.kuGou.MusicList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,14 +105,23 @@ public class BootApplicationTests {
 	}
 	@Test
 	public void test6(){
-		User user = new User().setName("猪小明").setId(3).setAge(null).setCreateTime(LocalDateTime.now());
-		redisTemplate.opsForValue().set("localDateTime",user);
-		Map<Object, Object> hash = redisTemplate.opsForHash().entries("hash");
-		System.out.println(hash);
-		redisTemplate.opsForValue().set("hhh",2);
+//		User user = new User().setName("猪小明").setId(3).setAge(null).setCreateTime(LocalDateTime.now());
+//		redisTemplate.opsForValue().set("localDateTime",user);
+//		Map<String,Object> map = new HashMap<>();
+//		map.put("1","abc");
+//		map.put("2","a");
+//		redisTemplate.opsForHash().putAll("map",map);
+//		Map<Object, Object> map1 = redisTemplate.opsForHash().entries("map");
+//		System.out.println(map1);
 //		redisTemplate.opsForValue().increment("hhh",3);
 //		System.out.println(redisTemplate.getExpire("hhh"));
 //		redisTemplate.expire("hhh",20, TimeUnit.SECONDS);
+
+//		redisTemplate.opsForHash().put("special:railway:setting","1",user);
+		User user1= (User) redisTemplate.opsForHash().get("special:railway:setting","1");
+		System.out.println(user1);
+
+
 	}
 
 }
