@@ -10,6 +10,7 @@ import com.example.boot.model.kuGou.MusicDetail;
 import com.example.boot.model.kuGou.MusicList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.outdoor.club.model.admin.ParamConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +106,7 @@ public class BootApplicationTests {
 	}
 	@Test
 	public void test6(){
-//		User user = new User().setName("猪小明").setId(3).setAge(null).setCreateTime(LocalDateTime.now());
+		User user = new User().setName("猪小明").setId(3).setAge(null).setCreateTime(LocalDateTime.now());
 //		redisTemplate.opsForValue().set("localDateTime",user);
 //		Map<String,Object> map = new HashMap<>();
 //		map.put("1","abc");
@@ -117,7 +118,12 @@ public class BootApplicationTests {
 //		System.out.println(redisTemplate.getExpire("hhh"));
 //		redisTemplate.expire("hhh",20, TimeUnit.SECONDS);
 
-//		redisTemplate.opsForHash().put("special:railway:setting","1",user);
+		ParamConfig paramConfig = new ParamConfig();
+		paramConfig.setValue("abc");
+		paramConfig.setAnotherValue("def");
+		paramConfig.setKey(123);
+		redisTemplate.opsForValue().set("param",paramConfig);
+		redisTemplate.opsForHash().put("special:railway:setting","1",user);
 		User user1= (User) redisTemplate.opsForHash().get("special:railway:setting","1");
 		System.out.println(user1);
 
