@@ -74,6 +74,9 @@ public class LogAspect {
                     String lockKey = redisLock.redisKey();
                     if (lockKey.contains("#")){
                         Object paramBody = paramMap.get("u");
+                        Class<?> paramBodyClass = paramBody.getClass();
+                        Method paramMethod = paramBodyClass.getMethod("getName");
+                        log.info(paramMethod.invoke(paramBody).toString());
                     }
                 }
             }

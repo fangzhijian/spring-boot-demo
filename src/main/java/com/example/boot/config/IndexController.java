@@ -88,7 +88,7 @@ public class IndexController {
     @RedisLock("#u.name")
 //    @Cacheable(cacheNames = "user",key = "#id")
     public User test(Integer id,User u){
-        log.info(body.getName());
+        log.info(u.toString());
         User user = new User();
         user.setAge(id);
         userMapper.updateUser(user);
