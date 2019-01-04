@@ -138,4 +138,18 @@ public class BootApplicationTests {
 		}
 	}
 
+	@Test
+	public void test7(){
+		Set<String> keys = redisTemplate.keys("clubOrderApply:*");
+		if (keys!=null){
+			keys.forEach((x)->{
+				Long expire = redisTemplate.getExpire(x);
+				if (expire != null && expire<0){
+					redisTemplate.delete(x);
+				}
+			});
+		}
+	}
+
+
 }

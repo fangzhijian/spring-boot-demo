@@ -1,5 +1,6 @@
 package com.example.boot.config;
 
+import com.example.boot.aspect.RedisLock;
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
 import com.example.boot.model.ExcelData;
@@ -84,8 +85,9 @@ public class IndexController {
     @GetMapping("/test")
     @ResponseBody
     @Transactional
+    @RedisLock("#u.name")
 //    @Cacheable(cacheNames = "user",key = "#id")
-    public User test(Integer id){
+    public User test(Integer id,User u){
         log.info(body.getName());
         User user = new User();
         user.setAge(id);
