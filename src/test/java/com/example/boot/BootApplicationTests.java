@@ -16,7 +16,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BootApplication.class)
@@ -42,6 +46,8 @@ public class BootApplicationTests {
 	private RestTemplate restTemplate;
 	@Autowired
 	private RedisTemplate<String,Object> redisTemplate;
+	@Autowired
+	private RedisConnectionFactory redisConnectionFactory;
 	@Test
 	public void contextLoads() throws SQLException {
 		System.out.println(restTemplate.getForObject("http://localhost:8888/api/appManage/getInfo",String.class));
@@ -104,30 +110,32 @@ public class BootApplicationTests {
 		String s = restTemplate.postForObject("http://localhost:9000/test5",user, String.class);
 		System.out.println(s);
 	}
+
+	//转移redis
 	@Test
 	public void test6(){
-		User user = new User().setName("猪小明").setId(3).setAge(null).setCreateTime(LocalDateTime.now());
-//		redisTemplate.opsForValue().set("localDateTime",user);
-//		Map<String,Object> map = new HashMap<>();
-//		map.put("1","abc");
-//		map.put("2","a");
-//		redisTemplate.opsForHash().putAll("map",map);
-//		Map<Object, Object> map1 = redisTemplate.opsForHash().entries("map");
-//		System.out.println(map1);
-//		redisTemplate.opsForValue().increment("hhh",3);
-//		System.out.println(redisTemplate.getExpire("hhh"));
-//		redisTemplate.expire("hhh",20, TimeUnit.SECONDS);
+		//原redis序列化格式
+		RedisTemplate<String,Object> template = new RedisTemplate<>();
+		template.setConnectionFactory(redisConnectionFactory);
+        GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+		StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+		template.setHashKeySerializer(stringRedisSerializer);
+		template.setHashValueSerializer(jackson2JsonRedisSerializer);
+		template.setKeySerializer(stringRedisSerializer);
+		template.setValueSerializer(jackson2JsonRedisSerializer);
+		template.afterPropertiesSet();
 
-		ParamConfig paramConfig = new ParamConfig();
-		paramConfig.setValue("abc");
-		paramConfig.setAnotherValue("def");
-		paramConfig.setKey(123);
-		redisTemplate.opsForValue().set("param",paramConfig);
-		redisTemplate.opsForHash().put("special:railway:setting","1",user);
-		User user1= (User) redisTemplate.opsForHash().get("special:railway:setting","1");
-		System.out.println(user1);
+		Map<Object, Object> entries = template.opsForHash().entries("club:manage:config");
+		redisTemplate.opsForHash().putAll("club:manage:config",entries);
 
+		Map<Object, Object> entries1 = template.opsForHash().entries("special:railway:setting");
+		redisTemplate.opsForHash().putAll("special:railway:setting",entries1);
 
+		Set<Object> members = template.opsForSet().members("club:order:scan:expire");
+		if (members != null){
+			redisTemplate.delete("club:order:scan:expire");
+			members.forEach((x)->redisTemplate.opsForSet().add("club:order:scan:expire",x));
+		}
 	}
 
 }
