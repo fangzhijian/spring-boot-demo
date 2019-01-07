@@ -72,6 +72,8 @@ public class LogAspect {
                 MethodLog methodLog = method.getAnnotation(MethodLog.class);
                 if (methodLog.value() == LogType.AROUND  || methodLog.value() == LogType.BEFORE){
                     log.info(sb.toString());
+                }else {
+                    log.info("方法{}.{}已进入",clazz.getName(),methodName);
                 }
             }else {
                 log.info(sb.toString());
@@ -112,17 +114,17 @@ public class LogAspect {
             Object  result= joinPoint.proceed();
             //拼写出参
             if (result == null){
-                log.info("方法{}.{}已结束",clazz.getName(),method.getName());
+                log.info("方法{}.{}已结束",clazz.getName(),methodName);
             }else {
                 if (method.isAnnotationPresent(MethodLog.class)){
                     MethodLog methodLog = method.getAnnotation(MethodLog.class);
                     if (methodLog.value() == LogType.AROUND || methodLog.value() == LogType.AFTER){
-                        log.info("方法{}.{}出参:{}",clazz.getName(),method.getName(),result.toString());
+                        log.info("方法{}.{}出参:{}",clazz.getName(),methodName,result.toString());
                     }else if (methodLog.value() == LogType.BEFORE){
-                        log.info("方法{}.{}已结束",clazz.getName(),method.getName());
+                        log.info("方法{}.{}已结束",clazz.getName(),methodName);
                     }
                 }else {
-                    log.info("方法{}.{}出参:{}",clazz.getName(),method.getName(),result.toString());
+                    log.info("方法{}.{}出参:{}",clazz.getName(),methodName,result.toString());
                 }
 
 
