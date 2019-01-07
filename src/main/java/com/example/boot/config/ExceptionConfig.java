@@ -1,5 +1,7 @@
 package com.example.boot.config;
 
+import com.example.boot.errorCode.PubError;
+import com.example.boot.model.InfoJson;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -17,7 +19,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Set;
-
 /**
  * User: 走路呼呼带风
  * Date: 2018/11/27
@@ -32,7 +33,7 @@ public class ExceptionConfig {
     //@Validated写在方法内括号内
     @ExceptionHandler(value = BindException.class)
     @ResponseBody
-    public String bindException(BindException bindException){
+    public InfoJson bindException(BindException bindException){
         List<ObjectError> allErrors = bindException.getAllErrors();
         StringBuilder sb = new StringBuilder();
         int size = allErrors.size();
@@ -48,14 +49,14 @@ public class ExceptionConfig {
                 sb.append("、");
             }
         }
-        return sb.toString();
+        return InfoJson.setFailed(PubError.P2002_PARAM_ERROR.code(),sb.toString());
     }
 
     //非实体类入参验证
     //@Validated写在类上面,即和@RestController、@Controller一起
     @ExceptionHandler(value = ConstraintViolationException.class)
     @ResponseBody
-    public String constraintViolationException(ConstraintViolationException constraintViolationException){
+    public InfoJson constraintViolationException(ConstraintViolationException constraintViolationException){
         StringBuilder sb = new StringBuilder();
         Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
         int start = 0;
@@ -68,14 +69,14 @@ public class ExceptionConfig {
             }
             start++;
         }
-        return sb.toString();
+        return InfoJson.setFailed(PubError.P2002_PARAM_ERROR.code(),sb.toString());
     }
 
     //使用@RequestParam对入参做空检验,
     // 一般用于文件和数组空校验,但校验不了isEmpty状态
     @ExceptionHandler(value = {MissingServletRequestParameterException.class, MissingServletRequestPartException.class})
     @ResponseBody
-    public String missingParameterException(ServletException servletException){
+    public InfoJson missingParameterException(ServletException servletException){
         String errorMsg = "入参不能为空";
         if (servletException instanceof MissingServletRequestParameterException){
             MissingServletRequestParameterException missingParameterException = (MissingServletRequestParameterException) servletException;
@@ -84,14 +85,15 @@ public class ExceptionConfig {
             MissingServletRequestPartException missingPartException = (MissingServletRequestPartException) servletException;
             errorMsg =  String.format("%s文件不能为空",missingPartException.getRequestPartName());
         }
-        return errorMsg;
+        return InfoJson.setFailed(PubError.P2001_PARAM_LACK.code(), errorMsg);
     }
 
-    //@Validated入参验证异常检验
+
+    //系统异常验证处理
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public String exception(Exception e){
+    public InfoJson exception(Exception e){
         log.error(e.getMessage(),e);
-        return e.getMessage();
+        return InfoJson.setFailed(PubError.P2003_SYSTEM_EXCEPTION.code(),PubError.P2003_SYSTEM_EXCEPTION.message());
     }
 }

@@ -1,5 +1,7 @@
 package com.example.boot.aspect;
 
+import com.example.boot.errorCode.PubError;
+import com.example.boot.model.InfoJson;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +46,9 @@ public class LogAspect {
         MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
         Class[]  parameterTypes = methodSignature.getParameterTypes();
         Method method;
-
+        String lockKey = null;
+        boolean deleteLockAsFinish = true;
+        boolean methodAnnotationLock;
         try {
 
             //拼写入参
@@ -53,7 +57,7 @@ public class LogAspect {
             String[] parameterNames = methodSignature.getParameterNames();
             Map<String,Object> paramMap = new HashMap<>(parameterNames.length);
             StringBuilder sb = new StringBuilder();
-            sb.append("方法").append(clazz.getName()).append(".").append(method.getName()).append("入参:");
+            sb.append("方法").append(clazz.getName()).append(".").append(methodName).append("入参:");
             for (int i = 0; i <parameterNames.length ; i++) {
                 sb.append(i).append("、").append(parameterNames[i]).append("--").append(parameterValues[i]).append("。");
                 paramMap.put(parameterNames[i],parameterValues[i]);
@@ -67,20 +71,19 @@ public class LogAspect {
             }else {
                 log.info(sb.toString());
             }
-
-            if (method.isAnnotationPresent(RedisLock.class)){
+            //判断redis分布式锁
+            methodAnnotationLock = method.isAnnotationPresent(RedisLock.class);
+            if (methodAnnotationLock){
                 RedisLock redisLock  = AnnotationUtils.findAnnotation(method, RedisLock.class);
                 if (redisLock != null){
-                    String lockKey = redisLock.redisKey();
-                    if (lockKey.contains("#")){
-                        Object paramBody = paramMap.get("u");
-                        Class<?> paramBodyClass = paramBody.getClass();
-                        Method paramMethod = paramBodyClass.getMethod("getName");
-                        log.info(paramMethod.invoke(paramBody).toString());
+                    deleteLockAsFinish = redisLock.deleteFinish();
+                    lockKey = getLockKey(redisLock.prefixKey(),redisLock.suffixKey(),methodName,paramMap);
+                    Boolean getLock =redisTemplate.opsForValue().setIfAbsent(lockKey,1,redisLock.expireTime(),redisLock.timeUnit());
+                    if (getLock == null || !getLock){
+                        return InfoJson.setFailed(PubError.P2006_REPEAT_CLICK.code(),PubError.P2006_REPEAT_CLICK.message());
                     }
                 }
             }
-
 
         } catch (NoSuchMethodException e) {
             log.error(e.getMessage(),e);
@@ -106,12 +109,55 @@ public class LogAspect {
 
 
             }
+            if (methodAnnotationLock && lockKey != null && deleteLockAsFinish){
+                log.info("我要删除redis锁了哦");
+                redisTemplate.delete(lockKey);
+            }
             return result;
         } catch (Throwable throwable) {
             log.error(throwable.getMessage(),throwable);
+            if (methodAnnotationLock && lockKey != null && deleteLockAsFinish){
+                log.info("我要删除redis锁了哦");
+                redisTemplate.delete(lockKey);
+            }
             throw throwable;
         }
 
 
+    }
+
+    //获取@RedisLcok注解中redis的key值
+    private String getLockKey(String prefixKey,String suffixKey,String methodName,Map<String,Object> paramMap) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String lockKey;
+        if ("lock:".equals(prefixKey)){
+            prefixKey = prefixKey+methodName+":";
+        }else {
+            prefixKey = "lock:"+prefixKey;
+        }
+        if (suffixKey.matches("^#(\\w|\\d|_)+")){
+            lockKey = prefixKey+ paramMap.get(suffixKey.substring(1));
+        }else if (suffixKey.matches("^#(\\w|\\d|_)+\\.(\\w|\\d|_)+$")){
+            String[] split = suffixKey.substring(1).split("\\.");
+            Object paramValue = paramMap.get(split[0]);
+            Class<?> clazz = paramValue.getClass();
+            String getFieldMethod = getFieldMethod(split[1]);
+            Method method = clazz.getDeclaredMethod(getFieldMethod);
+            method.setAccessible(true);
+            Object invoke = method.invoke(paramValue);
+            lockKey = prefixKey+invoke;
+        }else {
+            lockKey = prefixKey+suffixKey;
+        }
+        return lockKey;
+    }
+
+    //获取成员变量的get方法名
+    private String getFieldMethod(String fieldName){
+        //首字母大写
+        char[] chars = fieldName.toCharArray();
+        if (chars[0] >= 'a' && chars[0] <= 'z') {
+            chars[0] = (char)(chars[0] - 32);
+        }
+        return "get"+new String(chars);
     }
 }

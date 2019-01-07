@@ -4,6 +4,7 @@ import com.example.boot.aspect.RedisLock;
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
 import com.example.boot.model.ExcelData;
+import com.example.boot.model.InfoJson;
 import com.example.boot.model.User;
 import com.example.boot.util.ExcelUtils;
 import com.google.gson.Gson;
@@ -38,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 2018/10/10 14:21
@@ -69,8 +71,6 @@ public class IndexController {
             map.put(param.getKey().toString(),param);
         }
         redisTemplate.opsForHash().putAll("club:manage:config",map);
-
-
     }
 
     @PostMapping("appConfig")
@@ -85,9 +85,11 @@ public class IndexController {
     @GetMapping("/test")
     @ResponseBody
     @Transactional
-    @RedisLock("#u.name")
+    @RedisLock("#id")
+//    @RedisLock(value = "123",deleteFinish = false,expireTime = 5)
+//    @RedisLock(value = "#u.name",prefixKey = "order:",expireTime = 3500,timeUnit = TimeUnit.MILLISECONDS)
 //    @Cacheable(cacheNames = "user",key = "#id")
-    public User test(Integer id,User u){
+    public InfoJson test(Integer id, User u){
         log.info(u.toString());
         User user = new User();
         user.setAge(id);
@@ -95,7 +97,7 @@ public class IndexController {
         log.info(user.getAge().toString());
         User byId = userMapper.getById(id);
         byId.setId(null);
-        return byId;
+        return InfoJson.getSucc(byId);
     }
 
     @RequestMapping("/test2")
