@@ -8,6 +8,9 @@
 <!-- 属性描述 scan：性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。
 	debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <conversionRule conversionWord="highlight" converterClass="com.example.boot.config.HighlightingConverter"/>
+
     <contextName>outdoor-club-provider</contextName>
 
     <!--开发环境只打印控制台-->
@@ -15,7 +18,7 @@
     <appender name="DEV" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 对日志进行格式化,给控制台上颜色 -->
         <encoder>
-            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldGreen(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <pattern> %boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 

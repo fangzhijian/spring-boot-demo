@@ -94,11 +94,13 @@ public class IndexController {
 //    @RepeatLock(value = "#u.name",prefixKey = "order:",expireTime = 3,timeUnit = TimeUnit.SECONDS)
 //    @Cacheable(cacheNames = "user",key = "#id")
     public InfoJson test(Integer id, User u){
+        log.debug("debug");
         log.info(u.toString());
         User user = new User();
         user.setAge(id);
         userMapper.updateUser(user);
         log.warn(user.getAge().toString());
+        log.error("error");
         User byId = userMapper.getById(id);
         byId.setId(null);
         return InfoJson.getSucc(byId);

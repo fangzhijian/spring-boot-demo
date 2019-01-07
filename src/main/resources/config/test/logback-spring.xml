@@ -9,6 +9,9 @@
 	debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 
+    <conversionRule conversionWord="highlight" converterClass="com.example.boot.config.HighlightingConverter"/>
+
+
     <contextName>outdoor-club-provider</contextName>
 
     <!-- 定义日志文件 输入位置 -->
@@ -20,7 +23,7 @@
     <appender name="DEV" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 对日志进行格式化,给控制台上颜色 -->
         <encoder>
-            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldGreen(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <pattern> %boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 
@@ -100,7 +103,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldGreen(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <pattern> %boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
         </encoder>
     </appender>
 
