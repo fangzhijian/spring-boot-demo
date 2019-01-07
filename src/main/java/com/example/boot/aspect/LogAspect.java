@@ -144,7 +144,7 @@ public class LogAspect {
 
     }
 
-    //获取@RedisLcok注解中redis的key值
+    //获取注解中redis的key值
     private String getLockKey(String lockName,String prefixKey,String suffixKey,String methodName,Map<String,Object> paramMap) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String lockKey;
         if (!StringUtils.hasText(prefixKey)){
