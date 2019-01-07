@@ -98,7 +98,7 @@ public class IndexController {
         User user = new User();
         user.setAge(id);
         userMapper.updateUser(user);
-        log.info(user.getAge().toString());
+        log.warn(user.getAge().toString());
         User byId = userMapper.getById(id);
         byId.setId(null);
         return InfoJson.getSucc(byId);

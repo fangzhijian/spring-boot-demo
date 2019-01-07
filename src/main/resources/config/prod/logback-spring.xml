@@ -23,7 +23,7 @@
     <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 RollingFileAppender -->
     <appender name="ERROR"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 过滤器，只记录WARN级别的日志 -->
+        <!-- 过滤器，只记录ERROR级别的日志 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -78,11 +78,10 @@
     <!-- INFO级别日志 appender -->
     <appender name="INFO"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 过滤器，只记录INFO级别的日志 -->
+        <!-- 过滤器，只记录INFO、WARN、ERROR级别的日志 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
