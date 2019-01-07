@@ -181,6 +181,7 @@ public class LogAspect {
 
     //周期性尝试,直到获取到锁或者超过额定时间
     private void tryGetResourceLock(String resourceLockKey, long expireTime, TimeUnit timeUnit,int interVal,int timeOut) throws InterruptedException, BusinessException {
+        timeOut = timeOut<1500?1500:timeOut;
         long startTime = System.currentTimeMillis();
         Boolean getLock;
         while ((getLock = redisTemplate.opsForValue().setIfAbsent(resourceLockKey,1,expireTime,timeUnit)) !=null && !getLock){
