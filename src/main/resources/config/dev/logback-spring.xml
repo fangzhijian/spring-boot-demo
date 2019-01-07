@@ -10,8 +10,10 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 
     <conversionRule conversionWord="highlight" converterClass="com.example.boot.config.HighlightingConverter"/>
+    <springProperty scope="context" name="applicationName" source="spring.application.name"/>
 
-    <contextName>outdoor-club-provider</contextName>
+
+    <contextName>${applicationName}</contextName>
 
     <!--开发环境只打印控制台-->
     <!-- ConsoleAppender 控制台输出日志 -->

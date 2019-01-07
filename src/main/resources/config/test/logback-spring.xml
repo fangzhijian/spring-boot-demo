@@ -10,12 +10,12 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 
     <conversionRule conversionWord="highlight" converterClass="com.example.boot.config.HighlightingConverter"/>
+    <springProperty scope="context" name="applicationName" source="spring.application.name"/>
 
-
-    <contextName>outdoor-club-provider</contextName>
+    <contextName>${applicationName}</contextName>
 
     <!-- 定义日志文件 输入位置 -->
-    <property name="log_dir" value="/usr/local/outdoor-club-provider/logs" />
+    <property name="log_dir" value="/usr/local/${applicationName}/logs" />
     <!-- 日志最大的历史 30天 -->
     <property name="maxHistory" value="30" />
     <property name="maxFileSize" value="50MB" />

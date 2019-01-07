@@ -10,6 +10,8 @@ spring:
     cache: false
   gson:
     date-format: yyyy-MM-dd HH:mm:ss
+  application:
+    name: boot-demo
 mybatis:
   mapper-locations: mybatis/**/*Mapper.xml
   #开启多个别名
