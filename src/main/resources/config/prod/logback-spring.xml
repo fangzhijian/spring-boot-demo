@@ -10,7 +10,7 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 
     <contextName>outdoor-club-provider</contextName>
-    <!--测试环境不打印控制台-->
+    <!--生产环境不打印控制台-->
 
     <!-- 定义日志文件 输入位置 -->
     <property name="log_dir" value="/usr/local/outdoor-club-provider/logs" />
