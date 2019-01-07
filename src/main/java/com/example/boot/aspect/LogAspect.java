@@ -82,7 +82,7 @@ public class LogAspect {
                 RepeatLock repeatLock = AnnotationUtils.findAnnotation(method, RepeatLock.class);
                 if (repeatLock != null){
                     deleteLockAsFinish = repeatLock.deleteFinish();
-                    repeatLockKey = getLockKey("repeat:",repeatLock.prefixKey(), repeatLock.suffixKey(),methodName,paramMap);
+                    repeatLockKey = getLockKey("repeat:",repeatLock.prefixKey(), repeatLock.suffixKey(),clazz.getSimpleName(),methodName,paramMap);
                     Boolean getLock =redisTemplate.opsForValue().setIfAbsent(repeatLockKey,1, repeatLock.expireTime(), repeatLock.timeUnit());
                     if (getLock == null || !getLock){
                         return InfoJson.setFailed(PubError.P2006_REPEAT_CLICK.code(),PubError.P2006_REPEAT_CLICK.message());
@@ -94,7 +94,7 @@ public class LogAspect {
             if (methodAnnotationResourceLock){
                 ResourceLock resourceLock = AnnotationUtils.findAnnotation(method,ResourceLock.class);
                 if (resourceLock != null){
-                    resourceLockKey = getLockKey("resource:",resourceLock.prefixKey(),resourceLock.suffixKey(),methodName,paramMap);
+                    resourceLockKey = getLockKey("resource:",resourceLock.prefixKey(),resourceLock.suffixKey(),clazz.getSimpleName(),methodName,paramMap);
                     try {
                         tryGetResourceLock(resourceLockKey,resourceLock.expireTime(),resourceLock.timeUnit(), resourceLock.interVal(),resourceLock.timeOut());
                     }catch (BusinessException e){
@@ -145,10 +145,10 @@ public class LogAspect {
     }
 
     //获取注解中redis的key值
-    private String getLockKey(String lockName,String prefixKey,String suffixKey,String methodName,Map<String,Object> paramMap) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private String getLockKey(String lockName,String prefixKey,String suffixKey,String className,String methodName,Map<String,Object> paramMap) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String lockKey;
         if (!StringUtils.hasText(prefixKey)){
-            prefixKey = "lock:"+lockName+methodName+":";
+            prefixKey = "lock:"+lockName+className+":"+methodName+":";
         }else {
             prefixKey = "lock:"+lockName+prefixKey;
         }
