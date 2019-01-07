@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BootApplication.class)
@@ -151,5 +152,12 @@ public class BootApplicationTests {
 		}
 	}
 
-
+	@Test
+	public void test8() throws InterruptedException {
+		for (int i = 0; i <10 ; i++) {
+			Boolean redisLock = redisTemplate.opsForValue().setIfAbsent("redisLock", 1, 3, TimeUnit.SECONDS);
+			System.out.println(redisLock);
+			Thread.sleep(1000);
+		}
+	}
 }

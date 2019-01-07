@@ -1,6 +1,7 @@
 package com.example.boot.aspect;
 
 import com.example.boot.errorCode.PubError;
+import com.example.boot.exception.BusinessException;
 import com.example.boot.model.InfoJson;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -11,11 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.concurrent.TimeUnit;
 /**
  * 2018/9/18 9:52
  * 走路呼呼带风
@@ -46,9 +49,11 @@ public class LogAspect {
         MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
         Class[]  parameterTypes = methodSignature.getParameterTypes();
         Method method;
-        String lockKey = null;
-        boolean deleteLockAsFinish = true;
-        boolean methodAnnotationLock;
+        String repeatLockKey = null;            //防重复锁的key
+        String resourceLockKey = null;          //资源锁的key
+        boolean deleteLockAsFinish = false;     //是否在方法结束时删除防重复锁
+        boolean methodAnnotationRepeatLock;     //方法上是否标明放重复锁注解
+        boolean methodAnnotationResourceLock;   //方法上是否标明资源所注解
         try {
 
             //拼写入参
@@ -71,16 +76,29 @@ public class LogAspect {
             }else {
                 log.info(sb.toString());
             }
-            //判断redis分布式锁
-            methodAnnotationLock = method.isAnnotationPresent(RedisLock.class);
-            if (methodAnnotationLock){
-                RedisLock redisLock  = AnnotationUtils.findAnnotation(method, RedisLock.class);
-                if (redisLock != null){
-                    deleteLockAsFinish = redisLock.deleteFinish();
-                    lockKey = getLockKey(redisLock.prefixKey(),redisLock.suffixKey(),methodName,paramMap);
-                    Boolean getLock =redisTemplate.opsForValue().setIfAbsent(lockKey,1,redisLock.expireTime(),redisLock.timeUnit());
+            //判断redis防重复锁
+            methodAnnotationRepeatLock = method.isAnnotationPresent(RepeatLock.class);
+            if (methodAnnotationRepeatLock){
+                RepeatLock repeatLock = AnnotationUtils.findAnnotation(method, RepeatLock.class);
+                if (repeatLock != null){
+                    deleteLockAsFinish = repeatLock.deleteFinish();
+                    repeatLockKey = getLockKey("repeat:",repeatLock.prefixKey(), repeatLock.suffixKey(),methodName,paramMap);
+                    Boolean getLock =redisTemplate.opsForValue().setIfAbsent(repeatLockKey,1, repeatLock.expireTime(), repeatLock.timeUnit());
                     if (getLock == null || !getLock){
                         return InfoJson.setFailed(PubError.P2006_REPEAT_CLICK.code(),PubError.P2006_REPEAT_CLICK.message());
+                    }
+                }
+            }
+            //判断redis资源竞争锁
+            methodAnnotationResourceLock = method.isAnnotationPresent(ResourceLock.class);
+            if (methodAnnotationResourceLock){
+                ResourceLock resourceLock = AnnotationUtils.findAnnotation(method,ResourceLock.class);
+                if (resourceLock != null){
+                    resourceLockKey = getLockKey("resource:",resourceLock.prefixKey(),resourceLock.suffixKey(),methodName,paramMap);
+                    try {
+                        tryGetResourceLock(resourceLockKey,resourceLock.expireTime(),resourceLock.timeUnit(), resourceLock.interVal(),resourceLock.timeOut());
+                    }catch (BusinessException e){
+                        return InfoJson.setFailed(e.getCode(),e.getMessage());
                     }
                 }
             }
@@ -109,30 +127,30 @@ public class LogAspect {
 
 
             }
-            if (methodAnnotationLock && lockKey != null && deleteLockAsFinish){
-                log.info("我要删除redis锁了哦");
-                redisTemplate.delete(lockKey);
-            }
+
             return result;
         } catch (Throwable throwable) {
             log.error(throwable.getMessage(),throwable);
-            if (methodAnnotationLock && lockKey != null && deleteLockAsFinish){
-                log.info("我要删除redis锁了哦");
-                redisTemplate.delete(lockKey);
-            }
             throw throwable;
+        }finally {
+            if (methodAnnotationRepeatLock && repeatLockKey != null && deleteLockAsFinish){
+                redisTemplate.delete(repeatLockKey);
+            }
+            if (methodAnnotationResourceLock && resourceLockKey != null){
+                redisTemplate.delete(resourceLockKey);
+            }
         }
 
 
     }
 
     //获取@RedisLcok注解中redis的key值
-    private String getLockKey(String prefixKey,String suffixKey,String methodName,Map<String,Object> paramMap) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private String getLockKey(String lockName,String prefixKey,String suffixKey,String methodName,Map<String,Object> paramMap) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String lockKey;
-        if ("lock:".equals(prefixKey)){
-            prefixKey = prefixKey+methodName+":";
+        if (!StringUtils.hasText(prefixKey)){
+            prefixKey = "lock:"+lockName+methodName+":";
         }else {
-            prefixKey = "lock:"+prefixKey;
+            prefixKey = "lock:"+lockName+prefixKey;
         }
         if (suffixKey.matches("^#(\\w|\\d|_)+")){
             lockKey = prefixKey+ paramMap.get(suffixKey.substring(1));
@@ -159,5 +177,17 @@ public class LogAspect {
             chars[0] = (char)(chars[0] - 32);
         }
         return "get"+new String(chars);
+    }
+
+    //周期性尝试,直到获取到锁或者超过额定时间
+    private void tryGetResourceLock(String resourceLockKey, long expireTime, TimeUnit timeUnit,int interVal,int timeOut) throws InterruptedException, BusinessException {
+        long startTime = System.currentTimeMillis();
+        Boolean getLock;
+        while ((getLock = redisTemplate.opsForValue().setIfAbsent(resourceLockKey,1,expireTime,timeUnit)) !=null && !getLock){
+            if (System.currentTimeMillis()-startTime>timeOut+interVal){
+                throw new BusinessException(PubError.P2007_RESOURCE_CLICK.code(),PubError.P2007_RESOURCE_CLICK.message());
+            }
+            Thread.sleep(interVal);
+        }
     }
 }

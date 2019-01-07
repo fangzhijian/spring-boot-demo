@@ -1,6 +1,7 @@
 package com.example.boot.config;
 
-import com.example.boot.aspect.RedisLock;
+import com.example.boot.aspect.RepeatLock;
+import com.example.boot.aspect.ResourceLock;
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
 import com.example.boot.model.ExcelData;
@@ -13,10 +14,9 @@ import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,9 +85,10 @@ public class IndexController {
     @GetMapping("/test")
     @ResponseBody
     @Transactional
-    @RedisLock("#id")
-//    @RedisLock(value = "123",deleteFinish = false,expireTime = 5)
-//    @RedisLock(value = "#u.name",prefixKey = "order:",expireTime = 3500,timeUnit = TimeUnit.MILLISECONDS)
+    @RepeatLock(value = "#id",expireTime = 8000)
+    @ResourceLock(value = "#id",expireTime = 8000)
+//    @RepeatLock(value = "123",deleteFinish = true,expireTime = 5000)
+//    @RepeatLock(value = "#u.name",prefixKey = "order:",expireTime = 3,timeUnit = TimeUnit.SECONDS)
 //    @Cacheable(cacheNames = "user",key = "#id")
     public InfoJson test(Integer id, User u){
         log.info(u.toString());

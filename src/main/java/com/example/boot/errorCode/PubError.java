@@ -26,6 +26,8 @@ public enum PubError {
 
     P2006_REPEAT_CLICK(2006,"操作频率过快,请稍后再试"),
 
+    P2007_RESOURCE_CLICK(2007,"当前人数过多,稍后再试试看"),
+
 
     ;
 
