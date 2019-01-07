@@ -1,5 +1,7 @@
 package com.example.boot.config;
 
+import com.example.boot.aspect.LogType;
+import com.example.boot.aspect.MethodLog;
 import com.example.boot.aspect.RepeatLock;
 import com.example.boot.aspect.ResourceLock;
 import com.example.boot.mapper.UserMapper;
@@ -85,6 +87,7 @@ public class IndexController {
     @GetMapping("/test")
     @ResponseBody
     @Transactional
+    @MethodLog(LogType.BEFORE)
     @RepeatLock(value = "#id",expireTime = 8000)
     @ResourceLock(value = "#id",expireTime = 8000)
 //    @RepeatLock(value = "123",deleteFinish = true,expireTime = 5000)
