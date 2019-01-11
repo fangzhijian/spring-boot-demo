@@ -15,7 +15,7 @@ import java.util.Date;
  * 2018/10/10 16:40
  * 走路呼呼带风
  */
-public class Test {
+public  class Test {
     public static void main(String[] args) throws Exception{
         User user = new User();
         user.setId(2);
