@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,10 +155,7 @@ public class BootApplicationTests {
 
 	@Test
 	public void test8() throws InterruptedException {
-		for (int i = 0; i <10 ; i++) {
-			Boolean redisLock = redisTemplate.opsForValue().setIfAbsent("redisLock", 1, 3, TimeUnit.SECONDS);
-			System.out.println(redisLock);
-			Thread.sleep(1000);
-		}
+		List<Integer> list = Arrays.asList(7,8,9);
+		redisTemplate.opsForList().rightPushAll("a",13,14);
 	}
 }

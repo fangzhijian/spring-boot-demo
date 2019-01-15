@@ -2,6 +2,7 @@ package com.example.boot.service.impl;
 
 import com.example.boot.model.User;
 import com.example.boot.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
  * 2019/1/11 17:56
  * 走路呼呼带风
  */
+@Service("userService1")
 public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Integer id) {

@@ -9,6 +9,7 @@ import com.example.boot.model.Body;
 import com.example.boot.model.ExcelData;
 import com.example.boot.model.InfoJson;
 import com.example.boot.model.User;
+import com.example.boot.service.UserService;
 import com.example.boot.util.ExcelUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,6 +17,8 @@ import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -52,15 +55,33 @@ import java.util.concurrent.TimeUnit;
 @Validated
 public class IndexController {
 
-    @Autowired
-    public Body body;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private Gson gson;
-    @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
 
+    private final UserService userService;
+    private final Body body;
+    private final Gson gson;
+    private final UserMapper userMapper;
+    private final RedisTemplate<String,Object> redisTemplate;
+
+    public IndexController(@Qualifier("userService1")UserService userService, @Lazy Body body, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate) {
+        this.userService = userService;
+        this.body = body;
+        this.gson = gson;
+        this.userMapper = userMapper;
+        this.redisTemplate = redisTemplate;
+    }
+
+
+    @GetMapping("test2")
+    @ResponseBody
+    public void test2(){
+        log.info(body.getName());
+        log.info(gson.toJson(new User().setName("猪大肠").setId(2)));
+        User byId = userMapper.getById(1);
+        log.info(gson.toJson(byId));
+        User user = userService.getUser(2);
+        log.info(gson.toJson(user));
+
+    }
 
     @PostMapping("paramConfig")
     @ResponseBody
