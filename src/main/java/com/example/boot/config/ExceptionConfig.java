@@ -9,11 +9,9 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-
 import javax.servlet.ServletException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -24,7 +22,7 @@ import java.util.Set;
  * Date: 2018/11/27
  * Time: 22:51
  */
-@ControllerAdvice(basePackages = "com.example.boot")
+@RestControllerAdvice(basePackages = "com.example.boot")
 @Slf4j
 public class ExceptionConfig {
 
@@ -32,7 +30,6 @@ public class ExceptionConfig {
     //实体类入参验证异常处理
     //@Validated写在方法内括号内
     @ExceptionHandler(value = BindException.class)
-    @ResponseBody
     public InfoJson bindException(BindException bindException){
         List<ObjectError> allErrors = bindException.getAllErrors();
         StringBuilder sb = new StringBuilder();
@@ -55,7 +52,6 @@ public class ExceptionConfig {
     //非实体类入参验证
     //@Validated写在类上面,即和@RestController、@Controller一起
     @ExceptionHandler(value = ConstraintViolationException.class)
-    @ResponseBody
     public InfoJson constraintViolationException(ConstraintViolationException constraintViolationException){
         StringBuilder sb = new StringBuilder();
         Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
@@ -75,7 +71,6 @@ public class ExceptionConfig {
     //使用@RequestParam对入参做空检验,
     // 一般用于文件和数组空校验,但校验不了isEmpty状态
     @ExceptionHandler(value = {MissingServletRequestParameterException.class, MissingServletRequestPartException.class})
-    @ResponseBody
     public InfoJson missingParameterException(ServletException servletException){
         String errorMsg = "入参不能为空";
         if (servletException instanceof MissingServletRequestParameterException){
@@ -91,7 +86,6 @@ public class ExceptionConfig {
 
     //系统异常验证处理
     @ExceptionHandler(value = Exception.class)
-    @ResponseBody
     public InfoJson exception(Exception e){
         log.error(e.getMessage(),e);
         return InfoJson.setFailed(PubError.P2003_SYSTEM_EXCEPTION.code(),PubError.P2003_SYSTEM_EXCEPTION.message());

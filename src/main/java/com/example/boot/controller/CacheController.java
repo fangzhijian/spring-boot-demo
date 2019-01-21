@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,17 +31,18 @@ public class CacheController {
     }
 
     @PostMapping
-    @Cacheable(cacheNames = "demo",key = "#id")
-    public User user(Integer id){
+    @Cacheable(cacheNames = "demo",key = "#type+':'+#id")
+    public User user(Integer id,Integer type){
         log.info("insert:{}",id);
         return new User().setId(id).setName("猪大肠").setAge(18);
     }
 
 
     @DeleteMapping
-    @CacheEvict(cacheNames = "demo",key = "#id")
-    public void delete(Integer id){
+    @CacheEvict(cacheNames = "demo",key = "#result.id")
+    public User delete(Integer id){
         log.info("删除了缓存cache:{}",id);
+        return new User().setId(id);
     }
 
     @PutMapping
@@ -51,7 +53,7 @@ public class CacheController {
     }
 
     @GetMapping("user")
-    @CachePut(cacheNames = "user",key = "1")
+    @CachePut(cacheNames = "user",key = "0")
     public String user(){
         return "我叫小明";
     }
