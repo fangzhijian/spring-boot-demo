@@ -6,7 +6,7 @@ spring:
   redis:
     sentinel:
       master: mymaster
-      nodes: 192.168.0.202:26379,192.168.0.202:26380,192.168.0.202:26381
+      nodes: 192.168.2.202:26379,192.168.2.202:26380,192.168.2.202:26381
     password: redisredis
     jedis:
       pool:

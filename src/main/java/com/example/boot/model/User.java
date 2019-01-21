@@ -38,7 +38,7 @@ public class User implements Serializable{
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 //    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
 //    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
     private Integer age;//年龄
     private Date date = new Date();
 }
