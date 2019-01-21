@@ -8,12 +8,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -29,8 +27,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class LogAspect {
 
-    @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
+    private final RedisTemplate<String,Object> redisTemplate;
+
+    public LogAspect(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
 
     /**
@@ -186,7 +187,7 @@ public class LogAspect {
         timeOut = timeOut<1500?1500:timeOut;
         long startTime = System.currentTimeMillis();
         Boolean getLock;
-        while ((getLock = redisTemplate.opsForValue().setIfAbsent(resourceLockKey,1,expireTime,timeUnit)) !=null && !getLock){
+        while ((getLock = redisTemplate.opsForValue().setIfAbsent(resourceLockKey,1,expireTime,timeUnit)) ==null || !getLock){
             if (System.currentTimeMillis()-startTime>timeOut+interVal){
                 throw new BusinessException(PubError.P2007_RESOURCE_CLICK.code(),PubError.P2007_RESOURCE_CLICK.message());
             }

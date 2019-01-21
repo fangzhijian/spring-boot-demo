@@ -28,7 +28,7 @@ public  class Test {
 //        String path = "http://localhost:8888/api/articlelist?clId=1099&nowPageNo=1&sizePerPage=3";
 //        String path = "http://localhost:9000/efg?name=大壳&id=3&createTime="+new Date().toString();
 //        String path = "http://localhost:9000/hij?userJson="+userJson;
-        String path = "http://localhost:8888/api/club/searchMusicDetail?albumId=8238038&hash=14B802078B0AFD214D27AE744FF64F85";
+        String path = "http://localhost:8888/api/club/searchMusicDetail?hash=14B802078B0AFD214D27AE744FF64F85";
         URL url = new URL(HttpUtil.getEncodeUrl(path));
         long start = System.currentTimeMillis();
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

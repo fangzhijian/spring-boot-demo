@@ -1,4 +1,4 @@
-package com.example.boot.config;
+package com.example.boot.controller;
 
 import com.example.boot.aspect.LogType;
 import com.example.boot.aspect.MethodLog;

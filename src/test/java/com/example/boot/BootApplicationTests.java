@@ -77,7 +77,7 @@ public class BootApplicationTests {
 
 	@Test
 	public void kuGouMusicList(){
-		String keyword="9420";
+		String keyword="猪八戒背媳妇";
 		Integer pageNumber = 1;
 		Integer pageSize = 5;
 		String musicUrl = "http://songsearch.kuGou.com/song_search_v2?keyword={keyword}&page={pageNumber}&pagesize={pageSize}&userid=-1&clientver=&platform=WebFilter&tag=em&filter=2&iscorrection=1&privilege_filter=0";
