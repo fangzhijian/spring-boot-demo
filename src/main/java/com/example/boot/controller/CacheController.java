@@ -1,7 +1,9 @@
 package com.example.boot.controller;
 
 import com.example.boot.model.User;
+import com.example.boot.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,11 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class CacheController {
 
+    private final UserService userService;
+
+    public CacheController(@Qualifier("userService1") UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     @Cacheable(cacheNames = "demo",key = "#id")
     public User user(Integer id){
-        log.info("insert{}",id);
+        log.info("insert:{}",id);
         return new User().setId(id).setName("猪大肠").setAge(18);
     }
 
@@ -39,7 +46,7 @@ public class CacheController {
     @PutMapping
     @CachePut(cacheNames = "demo",key = "#id")
     public User put(Integer id){
-        log.info("put{}",id);
+        log.info("put:{}",id);
         return new User().setId(id).setName("猪小肠").setAge(6);
     }
 
@@ -55,4 +62,9 @@ public class CacheController {
         log.info("删除了缓存user::1");
     }
 
+    @GetMapping("service")
+    public User service(Integer id){
+        log.info("service:{}",id);
+        return userService.getUser(id);
+    }
 }
