@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -122,8 +123,10 @@ public class Config {
                 //使用RedisTemplate的Jackson序列化
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisTemplate.getValueSerializer()))
                 .disableCachingNullValues()
-                //过期时间12小时
-                .entryTtl(Duration.ofSeconds(seconds));
+                //过期时间
+                .entryTtl(Duration.ofSeconds(seconds))
+                //统一使用前缀cache,格式 cache:{cacheNames}:{key}
+                .computePrefixWith((x)->String.format("cache:%s:",x));
     }
 
     @Bean

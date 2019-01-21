@@ -23,7 +23,7 @@ public class CacheController {
 
 
     @PostMapping
-    @Cacheable(cacheNames = "cache",key = "#id")
+    @Cacheable(cacheNames = "demo",key = "#id")
     public User user(Integer id){
         log.info("insert{}",id);
         return new User().setId(id).setName("猪大肠").setAge(18);
@@ -31,13 +31,13 @@ public class CacheController {
 
 
     @DeleteMapping
-    @CacheEvict(cacheNames = "cache",key = "#id")
+    @CacheEvict(cacheNames = "demo",key = "#id")
     public void delete(Integer id){
         log.info("删除了缓存cache:{}",id);
     }
 
     @PutMapping
-    @CachePut(cacheNames = "cache",key = "#id")
+    @CachePut(cacheNames = "demo",key = "#id")
     public User put(Integer id){
         log.info("put{}",id);
         return new User().setId(id).setName("猪小肠").setAge(6);
