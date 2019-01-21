@@ -105,9 +105,9 @@ public class Config {
     @Bean
     public RedisCacheManager redisCacheManager(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory redisConnectionFactory) {
         return new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
-                //未指定key使用默认时间5小时
+                //未指定cacheNames使用默认时间5小时
                 this.getRedisCacheConfigurationWithTtl(3600L*5,redisTemplate),
-                //指定key自定义过期时间
+                //指定cacheNames自定义过期时间
                 this.getRedisCacheConfigurationMap(redisTemplate));
     }
     //修改特定cacheNames的缓存时间
