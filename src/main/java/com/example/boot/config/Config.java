@@ -43,7 +43,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -75,7 +77,7 @@ public class Config {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return initObjectMapper();
+        return this.initObjectMapper();
     }
 
     //修改RedisTemplate使用jackson序列化
@@ -84,9 +86,8 @@ public class Config {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
-//        GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        ObjectMapper objectMapper = initObjectMapper();
+        ObjectMapper objectMapper = this.initObjectMapper();
         //记录class,使之能反序列各种复杂结构
         objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         objectMapper.findAndRegisterModules();
@@ -103,14 +104,26 @@ public class Config {
     //spring缓存使用Redis
     @Bean
     public RedisCacheManager redisCacheManager(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
-        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+        return new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
+                //未指定key使用默认时间5小时
+                this.getRedisCacheConfigurationWithTtl(3600L*5,redisTemplate),
+                //指定key自定义过期时间
+                this.getRedisCacheConfigurationMap(redisTemplate));
+    }
+    //修改特定cacheNames的缓存时间
+    private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap(RedisTemplate<String, Object> redisTemplate) {
+        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
+        redisCacheConfigurationMap.put("user", this.getRedisCacheConfigurationWithTtl(3000L,redisTemplate));
+        return redisCacheConfigurationMap;
+    }
+    //redis缓存配置
+    private RedisCacheConfiguration getRedisCacheConfigurationWithTtl(Long seconds,RedisTemplate<String, Object> redisTemplate) {
+        return RedisCacheConfiguration.defaultCacheConfig()
                 //使用RedisTemplate的Jackson序列化
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisTemplate.getValueSerializer()))
                 .disableCachingNullValues()
                 //过期时间12小时
-                .entryTtl(Duration.ofHours(12));
-        return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
+                .entryTtl(Duration.ofSeconds(seconds));
     }
 
     @Bean

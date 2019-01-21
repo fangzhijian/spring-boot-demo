@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,18 @@ public class CacheController {
     public User put(Integer id){
         log.info("put{}",id);
         return new User().setId(id).setName("猪小肠").setAge(6);
+    }
+
+    @GetMapping("user")
+    @CachePut(cacheNames = "user",key = "1")
+    public String user(){
+        return "我叫小明";
+    }
+
+    @DeleteMapping("user")
+    @CacheEvict(cacheNames = "user",key = "1")
+    public void userEvict(){
+        log.info("删除了缓存user::1");
     }
 
 }
