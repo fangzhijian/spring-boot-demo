@@ -74,14 +74,8 @@ public class IndexController {
 
     @GetMapping("test2")
     @ResponseBody
-    public void test2(){
-        log.info(body.getName());
-        log.info(gson.toJson(new User().setName("猪大肠").setId(2)));
-        User byId = userMapper.getById(1);
-        log.info(gson.toJson(byId));
-        User user = userService.getUser(2);
-        log.info(gson.toJson(user));
-
+    public User test2(){
+        return userMapper.getById(53);
     }
 
     @PostMapping("paramConfig")

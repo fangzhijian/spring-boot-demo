@@ -19,9 +19,9 @@ spring:
   datasource:
     druid:
       #用户配置
-      url: jdbc:mysql://10.0.0.43:3306/club?characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=GMT%2B8
-      username: root
-      password: -1tsPc}[
+      url: jdbc:mysql://10.0.0.13:3306/club?characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false
+      username: prod
+      password: xz-R&D1}[
       driver-class-name: com.mysql.cj.jdbc.Driver
       #连接池配置
       connection-init-sqls: set names utf8mb4
