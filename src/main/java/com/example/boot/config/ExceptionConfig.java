@@ -1,6 +1,7 @@
 package com.example.boot.config;
 
 import com.example.boot.errorCode.PubError;
+import com.example.boot.exception.BusinessException;
 import com.example.boot.model.InfoJson;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
@@ -83,6 +84,12 @@ public class ExceptionConfig {
         return InfoJson.setFailed(PubError.P2001_PARAM_LACK.code(), errorMsg);
     }
 
+    //捕捉自定义异常
+    @ExceptionHandler(value = BusinessException.class)
+    public  InfoJson businessException(BusinessException e){
+        log.error(e.getMessage(),e);
+        return InfoJson.setFailed(e.getCode(),e.getMessage());
+    }
 
     //系统异常验证处理
     @ExceptionHandler(value = Exception.class)

@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 /**
@@ -16,15 +18,31 @@ import java.time.LocalDateTime;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private boolean flag = true;
+
     @Override
-    @Cacheable(cacheNames = "service",key = "#id")
+//    @Cacheable(cacheNames = "service",key = "#id")
     public User getUser(Integer id) {
+        flag = !flag;
+        Instant instant = Instant.now();
+        long a=0;
+        for (int i = 0; i <Integer.MAX_VALUE ; i++) {
+            a = a+i;
+            for (int j = 0; j <2 ; j++) {
+                a = a-1;
+            }
+        }
+        System.out.println(a);
+        System.out.println(Duration.between(instant,Instant.now()).toMillis());
         log.info("userService1:{}",id);
         User user = new User();
         user.setName("小明");
         user.setId(id);
         user.setAge(2);
         user.setCreateTime(LocalDateTime.now());
+        if (flag){
+            System.out.println(10/0);
+        }
         return user;
     }
 }

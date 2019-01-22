@@ -4,6 +4,7 @@ import com.example.boot.aspect.LogType;
 import com.example.boot.aspect.MethodLog;
 import com.example.boot.aspect.RepeatLock;
 import com.example.boot.aspect.ResourceLock;
+import com.example.boot.exception.BusinessException;
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
 import com.example.boot.model.ExcelData;
@@ -16,12 +17,10 @@ import com.google.gson.reflect.TypeToken;
 import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -214,5 +215,18 @@ public class IndexController {
     public Date test7(Date date,@RequestParam LocalDateTime dateTime){
         System.out.println(dateTime);
         return date;
+    }
+
+    @RequestMapping("test8")
+    @ResponseBody
+    public Long test8() throws BusinessException {
+        Instant instant = Instant.now();
+        try {
+            User user = userService.getUser(1);
+            log.info(user.toString());
+        }catch (Exception e){
+            throw new BusinessException(500,"年轻人好生心浮气躁");
+        }
+        return Duration.between(instant,Instant.now()).toMillis();
     }
 }
