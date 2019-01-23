@@ -26,6 +26,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       #连接池配置
       connection-init-sqls: set names utf8mb4
+      default-transaction-isolation: 2        #修改默认隔离级别为读提交,数值参考Isolation枚举类
       initial-size: 1
       max-active: 1000
       min-idle: 1
@@ -40,5 +41,4 @@ spring:
         enabled: false
       stat-view-servlet:
         enabled: false
-
 

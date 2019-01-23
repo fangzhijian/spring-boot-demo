@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 2019/1/21 9:19
  * 走路呼呼带风
@@ -65,8 +68,10 @@ public class CacheController {
     }
 
     @GetMapping("service")
-    public User service(Integer id){
+    public User service(Integer id, HttpServletResponse response){
         log.info("service:{}",id);
+        Cookie cookieNme = null;
+        response.addCookie(null);
         return userService.getUser(id);
     }
 }

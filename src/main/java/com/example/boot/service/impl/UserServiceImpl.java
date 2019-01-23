@@ -28,9 +28,6 @@ public class UserServiceImpl implements UserService {
         long a=0;
         for (int i = 0; i <Integer.MAX_VALUE ; i++) {
             a = a+i;
-            for (int j = 0; j <2 ; j++) {
-                a = a-1;
-            }
         }
         System.out.println(a);
         System.out.println(Duration.between(instant,Instant.now()).toMillis());

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,8 +75,13 @@ public class IndexController {
 
     @GetMapping("test2")
     @ResponseBody
-    public User test2(){
-        return userMapper.getById(53);
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    public User test2(Integer id) throws InterruptedException {
+        System.out.println(userMapper.getById(2));
+        Thread.sleep(3000);
+        System.out.println("=======");
+        System.out.println(userMapper.getById(1));
+        return new User().setName("猪大肠");
     }
 
     @PostMapping("paramConfig")
