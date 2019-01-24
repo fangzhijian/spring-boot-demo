@@ -44,3 +44,8 @@ spring:
         reset-enable: true
         login-username: root
         login-password: root
+  rabbitmq:
+    host: 10.0.0.43
+    port: 5672
+    username: root
+    password: root

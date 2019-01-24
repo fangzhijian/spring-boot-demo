@@ -68,10 +68,8 @@ public class CacheController {
     }
 
     @GetMapping("service")
-    public User service(Integer id, HttpServletResponse response){
+    public User service(Integer id,String name){
         log.info("service:{}",id);
-        Cookie cookieNme = null;
-        response.addCookie(null);
         return userService.getUser(id);
     }
 }

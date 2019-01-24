@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 /**
@@ -31,7 +33,9 @@ public class ExceptionConfig {
     //实体类入参验证异常处理
     //@Validated写在方法内括号内
     @ExceptionHandler(value = BindException.class)
-    public InfoJson bindException(BindException bindException){
+    public InfoJson bindException(BindException bindException,HttpServletRequest request){
+        logErrorRequestInfo(request);
+
         List<ObjectError> allErrors = bindException.getAllErrors();
         StringBuilder sb = new StringBuilder();
         int size = allErrors.size();
@@ -53,7 +57,9 @@ public class ExceptionConfig {
     //非实体类入参验证
     //@Validated写在类上面,即和@RestController、@Controller一起
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public InfoJson constraintViolationException(ConstraintViolationException constraintViolationException){
+    public InfoJson constraintViolationException(ConstraintViolationException constraintViolationException,HttpServletRequest request){
+        logErrorRequestInfo(request);
+
         StringBuilder sb = new StringBuilder();
         Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
         int start = 0;
@@ -72,7 +78,9 @@ public class ExceptionConfig {
     //使用@RequestParam对入参做空检验,
     // 一般用于文件和数组空校验,但校验不了isEmpty状态
     @ExceptionHandler(value = {MissingServletRequestParameterException.class, MissingServletRequestPartException.class})
-    public InfoJson missingParameterException(ServletException servletException){
+    public InfoJson missingParameterException(ServletException servletException,HttpServletRequest request){
+        logErrorRequestInfo(request);
+
         String errorMsg = "入参不能为空";
         if (servletException instanceof MissingServletRequestParameterException){
             MissingServletRequestParameterException missingParameterException = (MissingServletRequestParameterException) servletException;
@@ -86,15 +94,29 @@ public class ExceptionConfig {
 
     //捕捉自定义异常
     @ExceptionHandler(value = BusinessException.class)
-    public  InfoJson businessException(BusinessException e){
+    public  InfoJson businessException(BusinessException e,HttpServletRequest request){
+        logErrorRequestInfo(request);
         log.error(e.getMessage(),e);
         return InfoJson.setFailed(e.getCode(),e.getMessage());
     }
 
     //系统异常验证处理
     @ExceptionHandler(value = Exception.class)
-    public InfoJson exception(Exception e){
+    public InfoJson exception(Exception e, HttpServletRequest request){
+        logErrorRequestInfo(request);
         log.error(e.getMessage(),e);
         return InfoJson.setFailed(PubError.P2003_SYSTEM_EXCEPTION.code(),PubError.P2003_SYSTEM_EXCEPTION.message());
+    }
+
+    //打印错误的请求体信息
+    private void logErrorRequestInfo(HttpServletRequest request){
+        log.error("异常链接:{}",request.getRequestURL());
+        Enumeration<String> parameterNames = request.getParameterNames();
+        int paramOrder = 0;
+        while (parameterNames.hasMoreElements()){
+            String parameterName = parameterNames.nextElement();
+            paramOrder++;
+            log.error("{}、参数名：{} <===> 参数值：{}",paramOrder,parameterName,request.getParameter(parameterName));
+        }
     }
 }

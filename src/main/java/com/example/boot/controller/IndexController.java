@@ -59,14 +59,12 @@ public class IndexController {
 
 
     private final UserService userService;
-    private final Body body;
     private final Gson gson;
     private final UserMapper userMapper;
     private final RedisTemplate<String,Object> redisTemplate;
 
-    public IndexController(@Qualifier("userService1")UserService userService, @Lazy Body body, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate) {
+    public IndexController(@Qualifier("userService1")UserService userService, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate) {
         this.userService = userService;
-        this.body = body;
         this.gson = gson;
         this.userMapper = userMapper;
         this.redisTemplate = redisTemplate;
@@ -178,8 +176,15 @@ public class IndexController {
     public String abc(RedirectAttributes redirectAttributes){
         redirectAttributes.addAttribute("id",3);
         redirectAttributes.addAttribute("name","猪大肠");
-        redirectAttributes.addAttribute("createTime",new Date().toString());
+        redirectAttributes.addAttribute("createTime",new Date());
         return "redirect:efg";
+    }
+
+    @GetMapping("efg")
+    @ResponseBody
+    public String efg(String id,String name,Date createTime){
+        log.info("id,{}",createTime);
+        return name;
     }
 
 

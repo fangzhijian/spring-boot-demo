@@ -14,11 +14,11 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -148,7 +148,6 @@ public class Config {
         factory.setConnectTimeout(5000);//单位为ms
         return factory;
     }
-
 
 
     //Converter无法使用lambda注入bean,当前spring5.1.3
