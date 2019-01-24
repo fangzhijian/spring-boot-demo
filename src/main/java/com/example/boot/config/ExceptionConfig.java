@@ -51,6 +51,7 @@ public class ExceptionConfig {
                 sb.append("、");
             }
         }
+        log.error(sb.toString());
         return InfoJson.setFailed(PubError.P2002_PARAM_ERROR.code(),sb.toString());
     }
 
@@ -72,6 +73,7 @@ public class ExceptionConfig {
             }
             start++;
         }
+        log.error(sb.toString());
         return InfoJson.setFailed(PubError.P2002_PARAM_ERROR.code(),sb.toString());
     }
 
@@ -89,6 +91,7 @@ public class ExceptionConfig {
             MissingServletRequestPartException missingPartException = (MissingServletRequestPartException) servletException;
             errorMsg =  String.format("%s文件不能为空",missingPartException.getRequestPartName());
         }
+        log.error(errorMsg);
         return InfoJson.setFailed(PubError.P2001_PARAM_LACK.code(), errorMsg);
     }
 
@@ -96,7 +99,7 @@ public class ExceptionConfig {
     @ExceptionHandler(value = BusinessException.class)
     public  InfoJson businessException(BusinessException e,HttpServletRequest request){
         logErrorRequestInfo(request);
-        log.error(e.getMessage(),e);
+        log.error(e.getMessage());
         return InfoJson.setFailed(e.getCode(),e.getMessage());
     }
 
