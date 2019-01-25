@@ -4,6 +4,7 @@ import com.example.boot.aspect.LogType;
 import com.example.boot.aspect.MethodLog;
 import com.example.boot.aspect.RepeatLock;
 import com.example.boot.aspect.ResourceLock;
+import com.example.boot.errorCode.PubError;
 import com.example.boot.exception.BusinessException;
 import com.example.boot.mapper.UserMapper;
 import com.example.boot.model.Body;
@@ -16,6 +17,12 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -38,6 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -190,15 +199,41 @@ public class IndexController {
 
     @RequestMapping(value = "upload",method =RequestMethod.POST)
     @ResponseBody
-    public Integer upload(@RequestParam MultipartFile groupQrCode,
-                          @NotNull @Range(min = 3,max = 6) Integer id,
-                          @NotBlank @Size(max = 3) String name
-                      ,@RequestParam String[] strings
-                           ){
-        if (groupQrCode != null){
-            System.out.println(groupQrCode.isEmpty());
+    public InfoJson upload(@RequestParam MultipartFile file) throws IOException, BusinessException {
+        if (file == null || file.isEmpty()){
+            return InfoJson.setFailed(PubError.P2001_PARAM_LACK.code(),"请选择一个excel上传");
         }
-        return id;
+        String fileName = file.getOriginalFilename();
+        if (fileName == null || (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$"))) {
+            throw new BusinessException("上传文件格式不正确");
+        }
+        boolean isExcel2003 = true;
+        if (fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            isExcel2003 = false;
+        }
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook;
+        if (isExcel2003) {
+            workbook = new HSSFWorkbook(inputStream);
+        } else {
+            workbook = new XSSFWorkbook(inputStream);
+        }
+        Sheet sheet = workbook.getSheetAt(0);
+        for (int i = 0; i <4 ; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null){
+                continue;
+            }
+            for (int j = 0; j <20 ; j++) {
+                Cell cell = row.getCell(j);
+                if (cell != null){
+                    System.out.print(cell.getRow());
+                }
+                System.out.print("\t");
+            }
+            System.out.println();
+        }
+        return InfoJson.getSuccess();
     }
 
     @RequestMapping("test5")

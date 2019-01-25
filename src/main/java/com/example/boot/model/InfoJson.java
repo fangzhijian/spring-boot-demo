@@ -77,6 +77,12 @@ public class InfoJson implements Serializable {
         info.setData(data);
         return info;
     }
+    public static InfoJson getSuccess() {
+        InfoJson info = new InfoJson();
+        info.setResultCode(InfoJson.INFO_SUCCESS);
+        info.setResultMsg("成功");
+        return info;
+    }
     //data与getSucc用相同字符串的失败获取方法
     public static InfoJson getFail(Object data) {
         InfoJson info = new InfoJson();

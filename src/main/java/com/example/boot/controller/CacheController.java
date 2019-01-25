@@ -2,6 +2,7 @@ package com.example.boot.controller;
 
 import com.example.boot.model.User;
 import com.example.boot.service.UserService;
+import com.example.boot.util.ClubConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
@@ -62,9 +63,16 @@ public class CacheController {
     }
 
     @DeleteMapping("user")
-    @CacheEvict(cacheNames = "user",key = "1")
-    public void userEvict(){
+    @CacheEvict(cacheNames = "user",key = "0" ,condition = "#key=='1'")
+    public void userEvict(String key){
         log.info("删除了缓存user::1");
+    }
+
+    @DeleteMapping("apiContent")
+    @CacheEvict(cacheNames = "apiContent",allEntries = true,condition = "#key == "+ClubConstants.BACK_CLUB_SWITCH_MUSIC+" and #value1 == '0'")
+    public void contentEvict(String value1,Integer key){
+        System.out.println(value1);
+        System.out.println(key);
     }
 
     @GetMapping("service")

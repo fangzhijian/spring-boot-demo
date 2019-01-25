@@ -15,9 +15,9 @@
                     processData: false,
                     contentType: false
                 }).done(function(res) {
-                    alert(res)
+                    alert(res.resultMsg)
                 }).fail(function(res) {
-                    alert(res)
+                    alert(res.resultMsg)
                 });
 
             }) ;
@@ -31,7 +31,7 @@
         <form id="uploadForm" enctype="multipart/form-data">
             <label>狗肉</label><input type="text" name="name">
             <label>狗肉</label><input type="text" name="id">
-            <input type="file" name="groupQrCode"/>
+            <input type="file" name="file"/>
             <button id="upload" type="button">upload</button>
         </form>
 
