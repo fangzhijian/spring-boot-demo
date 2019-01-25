@@ -219,6 +219,8 @@ public class IndexController {
             workbook = new XSSFWorkbook(inputStream);
         }
         Sheet sheet = workbook.getSheetAt(0);
+        log.info("总列数:{}",sheet.getRow(0).getPhysicalNumberOfCells());
+        log.info("总行数:{}",sheet.getLastRowNum());
         for (int i = 0; i <4 ; i++) {
             Row row = sheet.getRow(i);
             if (row == null){
