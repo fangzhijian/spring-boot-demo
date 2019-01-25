@@ -15,6 +15,7 @@ import com.example.boot.service.UserService;
 import com.example.boot.util.ExcelUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.outdoor.club.controller.annualData.AnnualData;
 import com.outdoor.club.model.admin.ParamConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -219,21 +220,116 @@ public class IndexController {
             workbook = new XSSFWorkbook(inputStream);
         }
         Sheet sheet = workbook.getSheetAt(0);
-        log.info("总列数:{}",sheet.getRow(0).getPhysicalNumberOfCells());
-        log.info("总行数:{}",sheet.getLastRowNum());
-        for (int i = 0; i <4 ; i++) {
+        int totalRow = sheet.getLastRowNum();
+        log.info("总行数:{},开始导入数据到数据库",totalRow);
+        for (int i = 1; i <1+1 ; i++) {
             Row row = sheet.getRow(i);
             if (row == null){
                 continue;
             }
-            for (int j = 0; j <20 ; j++) {
-                Cell cell = row.getCell(j);
-                if (cell != null){
-                    System.out.print(cell.getRow());
-                }
-                System.out.print("\t");
+            AnnualData data = new AnnualData();
+            Cell cell1 =  row.getCell(0);
+            if (cell1 == null){
+                continue;
             }
-            System.out.println();
+            Integer userId = Double.valueOf(cell1.getNumericCellValue()).intValue();
+            data.setUserId(userId);
+
+            Cell cell2 =  row.getCell(1);
+            if (cell2 != null){
+                data.setPortrait(cell2.getStringCellValue());
+            }
+
+            Cell cell3 =  row.getCell(2);
+            if (cell3 != null){
+                if (cell3.getCellType() == Cell.CELL_TYPE_STRING){
+                    data.setNickName(cell3.getStringCellValue());
+                }else if (cell3.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                    data.setNickName(String.valueOf(cell3.getNumericCellValue()));
+                }
+            }
+            Cell cell4 =  row.getCell(3);
+            if (cell4 != null){
+                data.setCreateTime(cell4.getDateCellValue());
+            }
+            Cell cell5 =  row.getCell(4);
+            if (cell5 != null){
+                data.setUpgradeTime(cell5.getDateCellValue());
+            }
+            Cell cell6 =  row.getCell(5);
+            if (cell6 != null){
+                data.setSignInNum((Double.valueOf(cell6.getNumericCellValue()).intValue()));
+            }
+            Cell cell7 =  row.getCell(6);
+            if (cell7 != null){
+                data.setSignIntegral((Double.valueOf(cell7.getNumericCellValue()).intValue()));
+            }
+            Cell cell8 = row.getCell(7);
+            if (cell8 != null){
+                data.setShopPercent(cell8.getNumericCellValue());
+            }
+            Cell cell9 = row.getCell(8);
+            if (cell9 != null){
+                data.setFansNum((Double.valueOf(cell9.getNumericCellValue()).intValue()));
+            }
+            Cell cell10 = row.getCell(9);
+            if (cell10 != null){
+                data.setOrderNum((Double.valueOf(cell10.getNumericCellValue()).intValue()));
+            }
+            Cell cell11 = row.getCell(10);
+            if (cell11 != null){
+                data.setSaleroom(cell11.getNumericCellValue());
+            }
+            Cell cell12 = row.getCell(11);
+            if (cell12 != null){
+                data.setAnnualIntegral((Double.valueOf(cell12.getNumericCellValue()).intValue()));
+            }
+            Cell cell13 = row.getCell(12);
+            if (cell13 != null){
+                data.setCreateClubTime(cell13.getDateCellValue());
+            }
+            Cell cell14 = row.getCell(13);
+            if (cell14 != null){
+                data.setArticleNum((Double.valueOf(cell14.getNumericCellValue()).intValue()));
+            }
+            Cell cell15 = row.getCell(14);
+            if (cell15 != null){
+                data.setArticleView((Double.valueOf(cell15.getNumericCellValue()).intValue()));
+            }
+            Cell cell16 = row.getCell(15);
+            if (cell16 != null){
+                data.setActivityNum((Double.valueOf(cell16.getNumericCellValue()).intValue()));
+            }
+            Cell cell17 = row.getCell(16);
+            if (cell17 != null){
+                data.setActivityView((Double.valueOf(cell17.getNumericCellValue()).intValue()));
+            }
+            Cell cell18 = row.getCell(17);
+            if (cell18 != null){
+                data.setActivityApplyNum((Double.valueOf(cell18.getNumericCellValue()).intValue()));
+            }
+            Cell cell19 = row.getCell(18);
+            if (cell19 != null){
+                data.setInviteShop((Double.valueOf(cell19.getNumericCellValue()).intValue()));
+            }
+            Cell cell20 = row.getCell(19);
+            if (cell20 != null){
+                data.setShopIntegral((Double.valueOf(cell20.getNumericCellValue()).intValue()));
+            }
+            Cell cell21 = row.getCell(20);
+            if (cell21 != null){
+                data.setTopSaleDay(cell21.getStringCellValue());
+            }
+            Cell cell22 = row.getCell(21);
+            if (cell22 != null){
+                data.setTopSaleroom(cell22.getNumericCellValue());
+            }
+            Cell cell23 = row.getCell(22);
+            if (cell23 != null){
+                data.setTopOrderNum((Double.valueOf(cell23.getNumericCellValue()).intValue()));
+            }
+            log.info(data.toString());
+            redisTemplate.opsForValue().set(String.format("annualData:%s",userId),data);
         }
         return InfoJson.getSuccess();
     }
