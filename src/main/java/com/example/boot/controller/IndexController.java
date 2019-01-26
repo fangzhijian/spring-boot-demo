@@ -48,6 +48,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -222,7 +223,7 @@ public class IndexController {
         Sheet sheet = workbook.getSheetAt(0);
         int totalRow = sheet.getLastRowNum();
         log.info("总行数:{},开始导入数据到数据库",totalRow);
-        for (int i = 1; i <1+1 ; i++) {
+        for (int i = 1; i <totalRow+1 ; i++) {
             Row row = sheet.getRow(i);
             if (row == null){
                 continue;
@@ -236,7 +237,7 @@ public class IndexController {
             data.setUserId(userId);
 
             Cell cell2 =  row.getCell(1);
-            if (cell2 != null){
+            if (cell2 != null && cell2.getCellType() == Cell.CELL_TYPE_STRING){
                 data.setPortrait(cell2.getStringCellValue());
             }
 
@@ -258,31 +259,33 @@ public class IndexController {
             }
             Cell cell6 =  row.getCell(5);
             if (cell6 != null){
-                data.setSignInNum((Double.valueOf(cell6.getNumericCellValue()).intValue()));
+                data.setSignInNum(Double.valueOf(cell6.getNumericCellValue()).intValue());
             }
             Cell cell7 =  row.getCell(6);
             if (cell7 != null){
-                data.setSignIntegral((Double.valueOf(cell7.getNumericCellValue()).intValue()));
+                data.setSignIntegral(Double.valueOf(cell7.getNumericCellValue()).intValue());
             }
             Cell cell8 = row.getCell(7);
             if (cell8 != null){
-                data.setShopPercent(cell8.getNumericCellValue());
+                data.setShopPercent(new BigDecimal(cell8.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }else {
+                data.setShopPercent(new BigDecimal(23.66).setScale(2,BigDecimal.ROUND_HALF_EVEN));
             }
             Cell cell9 = row.getCell(8);
             if (cell9 != null){
-                data.setFansNum((Double.valueOf(cell9.getNumericCellValue()).intValue()));
+                data.setFansNum(Double.valueOf(cell9.getNumericCellValue()).intValue());
             }
             Cell cell10 = row.getCell(9);
             if (cell10 != null){
-                data.setOrderNum((Double.valueOf(cell10.getNumericCellValue()).intValue()));
+                data.setOrderNum(Double.valueOf(cell10.getNumericCellValue()).intValue());
             }
             Cell cell11 = row.getCell(10);
             if (cell11 != null){
-                data.setSaleroom(cell11.getNumericCellValue());
+                data.setSaleroom(new BigDecimal(cell11.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
             }
             Cell cell12 = row.getCell(11);
             if (cell12 != null){
-                data.setAnnualIntegral((Double.valueOf(cell12.getNumericCellValue()).intValue()));
+                data.setAnnualIntegral(Double.valueOf(cell12.getNumericCellValue()).intValue());
             }
             Cell cell13 = row.getCell(12);
             if (cell13 != null){
@@ -290,31 +293,31 @@ public class IndexController {
             }
             Cell cell14 = row.getCell(13);
             if (cell14 != null){
-                data.setArticleNum((Double.valueOf(cell14.getNumericCellValue()).intValue()));
+                data.setArticleNum(Double.valueOf(cell14.getNumericCellValue()).intValue());
             }
             Cell cell15 = row.getCell(14);
             if (cell15 != null){
-                data.setArticleView((Double.valueOf(cell15.getNumericCellValue()).intValue()));
+                data.setArticleView(Double.valueOf(cell15.getNumericCellValue()).intValue());
             }
             Cell cell16 = row.getCell(15);
             if (cell16 != null){
-                data.setActivityNum((Double.valueOf(cell16.getNumericCellValue()).intValue()));
+                data.setActivityNum(Double.valueOf(cell16.getNumericCellValue()).intValue());
             }
             Cell cell17 = row.getCell(16);
             if (cell17 != null){
-                data.setActivityView((Double.valueOf(cell17.getNumericCellValue()).intValue()));
+                data.setActivityView(Double.valueOf(cell17.getNumericCellValue()).intValue());
             }
             Cell cell18 = row.getCell(17);
             if (cell18 != null){
-                data.setActivityApplyNum((Double.valueOf(cell18.getNumericCellValue()).intValue()));
+                data.setActivityApplyNum(Double.valueOf(cell18.getNumericCellValue()).intValue());
             }
             Cell cell19 = row.getCell(18);
             if (cell19 != null){
-                data.setInviteShop((Double.valueOf(cell19.getNumericCellValue()).intValue()));
+                data.setInviteShop(Double.valueOf(cell19.getNumericCellValue()).intValue());
             }
             Cell cell20 = row.getCell(19);
             if (cell20 != null){
-                data.setShopIntegral((Double.valueOf(cell20.getNumericCellValue()).intValue()));
+                data.setShopIntegral(Double.valueOf(cell20.getNumericCellValue()).intValue());
             }
             Cell cell21 = row.getCell(20);
             if (cell21 != null){
@@ -322,11 +325,25 @@ public class IndexController {
             }
             Cell cell22 = row.getCell(21);
             if (cell22 != null){
-                data.setTopSaleroom(cell22.getNumericCellValue());
+                data.setTopSaleroom(new BigDecimal(cell22.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
             }
             Cell cell23 = row.getCell(22);
             if (cell23 != null){
-                data.setTopOrderNum((Double.valueOf(cell23.getNumericCellValue()).intValue()));
+                data.setTopOrderNum(Double.valueOf(cell23.getNumericCellValue()).intValue());
+            }
+            Cell cell24 = row.getCell(23);
+            if (cell24 != null){
+                data.setMemberType(Double.valueOf(cell24.getNumericCellValue()).intValue());
+            }
+            Cell cell25 = row.getCell(24);
+            if (cell25 != null){
+                data.setSaleroomPercent(new BigDecimal(cell25.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }else {
+                data.setSaleroomPercent(new BigDecimal("32.28").setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }
+            Cell cell26 = row.getCell(25);
+            if (cell26 != null){
+                data.setLabel(Double.valueOf(cell26.getNumericCellValue()).intValue());
             }
             log.info(data.toString());
             redisTemplate.opsForValue().set(String.format("annualData:%s",userId),data);
