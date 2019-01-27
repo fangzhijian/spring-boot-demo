@@ -14,9 +14,17 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -76,22 +84,30 @@ public class Config {
         return objectMapper;
     }
 
+    //mvc使用的json,不带记录全类名,可以被其他语言解析
     @Bean
+    @Primary
     public ObjectMapper objectMapper() {
         return this.initObjectMapper();
+    }
+
+    //json记录全类名,可以被反序列化
+    @Bean(name = "commonObjectMapper")
+    public ObjectMapper commonObjectMapper(){
+        ObjectMapper objectMapper = this.initObjectMapper();
+        //记录class,使之能反序列各种复杂结构
+        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        objectMapper.findAndRegisterModules();
+        return objectMapper;
     }
 
     //修改RedisTemplate使用jackson序列化
     // redis key值使用String类型,操作hash时map的key值也要使用String
     @Bean(name = "redisTemplate")
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier("commonObjectMapper") ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        ObjectMapper objectMapper = this.initObjectMapper();
-        //记录class,使之能反序列各种复杂结构
-        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        objectMapper.findAndRegisterModules();
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         template.setHashKeySerializer(stringRedisSerializer);
@@ -146,6 +162,25 @@ public class Config {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setReadTimeout(5000);//单位为ms
         factory.setConnectTimeout(5000);//单位为ms
+        return factory;
+    }
+
+
+    //rabbitMQ和RabbitListener序列化使用jackson
+    @Bean
+    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate,
+                                                                            @Qualifier("commonObjectMapper") ObjectMapper objectMapper){
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        //使用jackson序列化
+        Jackson2JsonMessageConverter messageConverter = new Jackson2JsonMessageConverter(objectMapper);
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
+        factory.setMaxConcurrentConsumers(1000);
+        factory.setConcurrentConsumers(100);
+        factory.setReceiveTimeout(10000L);
+        //手动确定消息
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        rabbitTemplate.setMessageConverter(messageConverter);
         return factory;
     }
 

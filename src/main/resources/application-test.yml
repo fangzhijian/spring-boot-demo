@@ -49,3 +49,7 @@ spring:
     port: 5672
     username: root
     password: root
+    virtual-host: /
+    publisher-confirms: true
+    publisher-returns: true
+
