@@ -13,9 +13,6 @@ import java.lang.reflect.Proxy;
 @Slf4j
 public class  JdkProxy implements InvocationHandler {
 
-    //如果使用同一个JdkProxy会存在object的线性安全问题
-    //可以将object写为一个map,每次注入的时候bean名称就是key,value就是静态示例
-    //spring使用map注册的单列模式,可以完美的使用动态代理
     private Object object;
 
     public static JdkProxy getInstance(){

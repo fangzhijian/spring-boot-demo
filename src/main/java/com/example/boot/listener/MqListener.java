@@ -18,13 +18,13 @@ import java.io.IOException;
  */
 @Component
 @Slf4j
-@RabbitListener(queues={"club-order"})
+//@RabbitListener(queues={"club-order"})
 public class MqListener {
 
     @RabbitHandler
     public void demo(String name, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         log.info("rabbitmq已接收到消息:来者{}",name);
-        if ("朱大肠".equals(name)){
+        if ("朱大明".equals(name)){
             //将消息重新放回准备队列,准备队列马上可以被消费,有可能造成无限消费循环
             channel.basicNack(tag,false,true);
         }else if ("朱小明".equals(name)){

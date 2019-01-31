@@ -12,6 +12,7 @@ import com.example.boot.model.ExcelData;
 import com.example.boot.model.InfoJson;
 import com.example.boot.model.User;
 import com.example.boot.service.UserService;
+import com.example.boot.service.impl.UserService2Impl;
 import com.example.boot.util.ExcelUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,6 +29,7 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -74,7 +78,7 @@ public class IndexController {
     private final UserMapper userMapper;
     private final RedisTemplate<String,Object> redisTemplate;
 
-    public IndexController(@Qualifier("userService1")UserService userService, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate) {
+    public IndexController(@Qualifier("userService2")UserService userService, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate) {
         this.userService = userService;
         this.gson = gson;
         this.userMapper = userMapper;
@@ -85,11 +89,15 @@ public class IndexController {
     @GetMapping("test2")
     @ResponseBody
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
-    public User test2(Integer id) throws InterruptedException {
-        System.out.println(userMapper.getById(2));
-        Thread.sleep(3000);
-        System.out.println("=======");
-        System.out.println(userMapper.getById(1));
+    public User test2(Integer id, HttpServletRequest request) throws InterruptedException {
+
+        System.out.println(userService.getUser(2));
+//        System.out.println(userMapper.getById(2));
+//        Thread.sleep(3000);
+//        System.out.println("=======");
+//        System.out.println(userMapper.getById(1));
+        final String s = UserService2Impl.stringValueResolver.resolveStringValue("${baseUrl}");
+        System.out.println("||||"+s);
         return new User().setName("猪大肠");
     }
 
