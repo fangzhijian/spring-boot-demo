@@ -8,9 +8,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.EmbeddedValueResolverAware;
+import org.springframework.context.event.EventListener;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringValueResolver;
+
+import java.util.concurrent.Executors;
 
 /**
  * 2019/1/15 12:03
@@ -29,7 +33,6 @@ public class UserService2Impl implements UserService,EmbeddedValueResolverAware{
         System.out.println(s);
         return new User().setName("小红");
     }
-
 
     @Override
     public void setEmbeddedValueResolver(@Nullable StringValueResolver resolver) {

@@ -27,7 +27,7 @@ import java.util.Date;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements Serializable{
+public class User extends Father implements Serializable{
 
     @Max(value = 3,message = "id长度不能超过3")
     private Integer id;
@@ -41,4 +41,8 @@ public class User implements Serializable{
     private LocalDateTime createTime = LocalDateTime.now();
     private Integer age;//年龄
     private Date date = new Date();
+
+    public void eat(String food,Integer score){
+        System.out.println(food+"||"+score);
+    }
 }
