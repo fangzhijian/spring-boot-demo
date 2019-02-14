@@ -6,8 +6,8 @@ import com.example.boot.aspect.RepeatLock;
 import com.example.boot.aspect.ResourceLock;
 import com.example.boot.errorCode.PubError;
 import com.example.boot.exception.BusinessException;
+import com.example.boot.listener.springEvent.MyApplicationEvent;
 import com.example.boot.mapper.UserMapper;
-import com.example.boot.model.Body;
 import com.example.boot.model.ExcelData;
 import com.example.boot.model.InfoJson;
 import com.example.boot.model.User;
@@ -25,11 +25,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,12 +41,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,12 +72,14 @@ public class IndexController {
     private final Gson gson;
     private final UserMapper userMapper;
     private final RedisTemplate<String,Object> redisTemplate;
+    private final ApplicationContext applicationContext;
 
-    public IndexController(@Qualifier("userService2")UserService userService, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate) {
+    public IndexController(@Qualifier("userService2")UserService userService, Gson gson, UserMapper userMapper, RedisTemplate<String, Object> redisTemplate, ApplicationContext applicationContext) {
         this.userService = userService;
         this.gson = gson;
         this.userMapper = userMapper;
         this.redisTemplate = redisTemplate;
+        this.applicationContext = applicationContext;
     }
 
 
@@ -391,5 +388,16 @@ public class IndexController {
             throw new BusinessException(500,"年轻人好生心浮气躁");
         }
         return Duration.between(instant,Instant.now()).toMillis();
+    }
+
+    @RequestMapping("test9")
+    @ResponseBody
+    @Transactional
+    public void test9(Integer age){
+        User user = new User();
+        user.setId(1);
+        user.setAge(age);
+        userMapper.updateUser(user);
+        applicationContext.publishEvent(new MyApplicationEvent(user));
     }
 }
