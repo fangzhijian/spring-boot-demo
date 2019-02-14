@@ -26,6 +26,7 @@ public @interface Property {
 
     /**
      *  是否在启动时检查value值在环境中是否存在
+     *  默认true, 工具包中可以设置false,防止其他项目没有配置启动不了
      */
-    boolean check() default false;
+    boolean check() default true;
 }

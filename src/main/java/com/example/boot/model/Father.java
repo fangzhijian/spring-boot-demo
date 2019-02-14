@@ -10,5 +10,5 @@ import lombok.Data;
 public class Father {
 
     private String fatherName;
-    private Short fatherAge;
+    private Long fatherAge;
 }

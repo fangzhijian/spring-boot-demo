@@ -125,9 +125,6 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
         }
     }
 
-    /**
-     * 给成员变量赋值
-     */
     private void setField(Object bean,Field field,String propertyValue) throws IllegalAccessException {
         String fieldTypeName = field.getType().getName();
         switch (fieldTypeName){
@@ -135,25 +132,25 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
                 field.set(bean,propertyValue);
                 break;
             case "java.lang.Byte": case "byte":
-                field.setByte(bean,Byte.parseByte(propertyValue));
+                field.set(bean,Byte.parseByte(propertyValue));
                 break;
             case "java.lang.Short": case "short":
-                field.setShort(bean,Short.parseShort(propertyValue));
+                field.set(bean,Short.parseShort(propertyValue));
                 break;
             case "java.lang.Integer": case "int":
-                field.setInt(bean,Integer.parseInt(propertyValue));
+                field.set(bean,Integer.parseInt(propertyValue));
                 break;
             case "java.lang.Long":    case "long":
-                field.setLong(bean,Long.parseLong(propertyValue));
+                field.set(bean,Long.parseLong(propertyValue));
                 break;
             case "java.lang.Double":  case "double":
-                field.setDouble(bean,Double.parseDouble(propertyValue));
+                field.set(bean,Double.parseDouble(propertyValue));
                 break;
             case "java.lang.Float":   case "float":
-                field.setFloat(bean,Float.parseFloat(propertyValue));
+                field.set(bean,Float.parseFloat(propertyValue));
                 break;
             case "java.lang.Boolean": case "boolean":
-                field.setBoolean(bean,Boolean.parseBoolean(propertyValue));
+                field.set(bean,Boolean.parseBoolean(propertyValue));
                 break;
             default:
                 throw new BeanInitializationException(String.format("Bean使用@Property赋值时不支持该类型%s",fieldTypeName));
