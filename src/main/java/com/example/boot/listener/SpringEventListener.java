@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 /**
  * 2019/2/14 16:38
  * 走路呼呼带风
- * spring事件监听器
+ * spring事件监听器, 作用范围用一个项目同一个spring容器 ,广播式传播所有监听者
  * 默认监听器 SimpleApplicationEventMulticaster
  * 事件监听器具有事物,会遵循触发监听事件的事物
- *  SimpleApplicationEventMulticaster可以设置为异步方法
+ * SimpleApplicationEventMulticaster可以设置为异步方法
  *      查看方法 setTaskExecutor 和 multicastEvent
  * @see org.springframework.context.event.SimpleApplicationEventMulticaster
  *
