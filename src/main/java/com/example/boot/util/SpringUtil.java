@@ -1,6 +1,10 @@
 package com.example.boot.util;
 
 import com.example.boot.aspect.Property;
+import com.example.boot.listener.rabbit.CorrelationMessage;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -23,7 +27,26 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
 
     private static StringValueResolver stringValueResolver;
     private static ApplicationContext applicationContext;
+    private static RabbitTemplate rabbitTemplate;
 
+    /**
+     *  用于发送 rabbitMQ , 包装一层CorrelationInfo。
+     *  CorrelationInfo继承于CorrelationData,主要作用是由于
+     *  消息发送到 exchange失败时无法获取发送消息,而CorrelationData只能设置一个id
+     *  本项目MQ从 1、发送端到exchange交换器 2、exchange到queue队列 失败时，记录数据库
+     *             3、queue队列到消费端失败采用手动ack应答
+     *  当使用 amqpTemplate和rabbitTemplate工具发送时,步骤1失败不会做失败策略
+     * @see org.springframework.amqp.core.AmqpTemplate
+     * @see org.springframework.amqp.rabbit.core.RabbitTemplate
+     * @param exchange          交换器
+     * @param routingKey        路由键
+     * @param object            消息实体
+     */
+    public static void sendRabbitMQ(String exchange, String routingKey, final Object object){
+        Message message = rabbitTemplate.getMessageConverter().toMessage(object, new MessageProperties());
+        CorrelationMessage correlationInfo = new CorrelationMessage(exchange,routingKey,message.getBody());
+        rabbitTemplate.convertAndSend(exchange,routingKey,message,correlationInfo);
+    }
 
     /**
      * @see org.springframework.beans.factory.annotation.Value
@@ -81,12 +104,19 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
 
     @Override
     public void setEmbeddedValueResolver(@Nullable StringValueResolver resolver) {
+        if (resolver == null){
+            throw new BeanInitializationException("StringValueResolver初始化时为空");
+        }
         SpringUtil.stringValueResolver = resolver;
     }
 
     @Override
     public void setApplicationContext(@Nullable ApplicationContext applicationContext) throws BeansException {
+        if (applicationContext == null){
+            throw new BeanInitializationException("StringValueResolver初始化时为空");
+        }
         SpringUtil.applicationContext = applicationContext;
+        SpringUtil.rabbitTemplate = applicationContext.getBean(RabbitTemplate.class);
     }
 
     @Override

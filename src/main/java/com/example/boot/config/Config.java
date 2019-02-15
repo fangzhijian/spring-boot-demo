@@ -1,5 +1,6 @@
 package com.example.boot.config;
 
+import com.example.boot.listener.rabbit.RabbitCallback;
 import com.example.boot.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +16,6 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.amqp.core.AcknowledgeMode;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -67,6 +66,9 @@ import java.util.TimeZone;
 @PropertySource({"${config.path}/base.properties"})
 @Slf4j
 public class Config {
+    public Config(){
+
+    }
 
     private ObjectMapper initObjectMapper(){
         ObjectMapper objectMapper = new ObjectMapper();
@@ -170,7 +172,7 @@ public class Config {
     //rabbitMQ和RabbitListener序列化使用jackson
     @Bean
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate,
-                                                                            @Qualifier("commonObjectMapper") ObjectMapper objectMapper){
+                                                                            @Qualifier("commonObjectMapper") ObjectMapper objectMapper,RabbitCallback rabbitCallback){
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         //使用jackson序列化
         Jackson2JsonMessageConverter messageConverter = new Jackson2JsonMessageConverter(objectMapper);
@@ -179,7 +181,11 @@ public class Config {
         factory.setMaxConcurrentConsumers(1000);
         factory.setConcurrentConsumers(100);
         factory.setReceiveTimeout(10000L);
-        //手动确定消息
+        //1、发送端到exchange交换器
+        rabbitTemplate.setConfirmCallback(rabbitCallback);
+        //2、exchange到queue队列
+        rabbitTemplate.setReturnCallback(rabbitCallback);
+        //3、queue队列到消费端失败采用手动ack应答
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         rabbitTemplate.setMessageConverter(messageConverter);
         return factory;
