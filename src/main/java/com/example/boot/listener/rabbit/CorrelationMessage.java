@@ -17,5 +17,6 @@ public class CorrelationMessage extends CorrelationData implements Serializable 
     private String exchange;   //交换器
     private String routingKey; //路由键
     private byte[] body;       //消息实体
+    private String messageId;  //消息id,可用于更新重新发送次数
 
 }

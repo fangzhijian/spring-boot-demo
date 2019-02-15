@@ -36,6 +36,7 @@ public class RabbitCallback implements RabbitTemplate.ConfirmCallback,RabbitTemp
                 exchange = message.getExchange();
                 routingKey = message.getRoutingKey();
                 body = new String(message.getBody());
+                log.error(message.getMessageId());
                 //异步记录到数据库,并用定时任务去扫描重发,并设置重发次数
                 try {
                     //使用相同的序列化objectMapper得到类,并重新发送
@@ -54,6 +55,7 @@ public class RabbitCallback implements RabbitTemplate.ConfirmCallback,RabbitTemp
                                 @Nullable String exchange,@Nullable String routingKey) {
         if (message!= null){
             String body = new String(message.getBody());
+            log.error(message.getMessageProperties().getMessageId()+"");
             log.error("消息发送到队列发送失败,exchange={},routingKey={},body={},由于{}",exchange,routingKey,body,replyText);
             //异步记录到数据库,并用定时任务去扫描重发,并设置重发次数
         }

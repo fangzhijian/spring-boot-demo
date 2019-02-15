@@ -3,6 +3,8 @@ package com.example.boot.listener;
 import com.example.boot.model.User;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -45,7 +47,7 @@ public class MqListener {
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue("test"),exchange = @Exchange(value = "abc",type = "topic"),key = "user.#"),
                                 @QueueBinding(value = @Queue("test2"),exchange = @Exchange(value = "abc",type = "topic"),key = "user.32")})
-    public void test(User abc, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+    public void test(User abc, Channel channel,@Header(AmqpHeaders.DELIVERY_TAG)long tag) throws IOException {
         log.info("年轻人好生心浮气躁1:{}",abc);
         channel.basicAck(tag,false);
     }
