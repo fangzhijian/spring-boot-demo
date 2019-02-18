@@ -2,6 +2,7 @@ package com.example.boot.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.ibatis.type.Alias;
@@ -15,6 +16,7 @@ import java.util.Date;
  * 走路呼呼带风
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Alias("user")
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -34,7 +36,4 @@ public class User extends Father implements Serializable{
     private Integer age;//年龄
     private Date date = new Date();
 
-    public void eat(String food,Integer score){
-        System.out.println(food+"||"+score);
-    }
 }
