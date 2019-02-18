@@ -31,7 +31,7 @@ public class RabbitCallback implements RabbitTemplate.ConfirmCallback,RabbitTemp
             String exchange = null;
             String routingKey = null;
             String body = null;
-            if (correlationData != null && correlationData instanceof CorrelationMessage){
+            if (correlationData instanceof CorrelationMessage){
                 CorrelationMessage message = (CorrelationMessage) correlationData;
                 exchange = message.getExchange();
                 routingKey = message.getRoutingKey();
