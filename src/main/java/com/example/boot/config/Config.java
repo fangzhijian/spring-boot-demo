@@ -66,13 +66,13 @@ import java.util.TimeZone;
 @PropertySource({"${config.path}/base.properties"})
 @Slf4j
 public class Config {
-    public Config(){
 
-    }
-
+    /**
+     * 设置jackson的objectMapper格式
+     */
     private ObjectMapper initObjectMapper(){
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        objectMapper.setDateFormat(DateUtil.yyyy_MM_ddHH_mm_ss);
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
@@ -87,14 +87,18 @@ public class Config {
         return objectMapper;
     }
 
-    //mvc使用的json,不带记录全类名,可以被其他语言解析
+    /**
+     * jackson不带记录全类名,可以被其他语言解析
+     */
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
         return this.initObjectMapper();
     }
 
-    //json记录全类名,可以被反序列化
+    /**
+     * json记录全类名,可以被通用Object类反序列化
+     */
     @Bean(name = "commonObjectMapper")
     public ObjectMapper commonObjectMapper(){
         ObjectMapper objectMapper = this.initObjectMapper();
@@ -104,8 +108,10 @@ public class Config {
         return objectMapper;
     }
 
-    //修改RedisTemplate使用jackson序列化
-    // redis key值使用String类型,操作hash时map的key值也要使用String
+    /**
+     * 修改RedisTemplate使用jackson序列化
+     * redis key值使用String类型,操作hash时map的key值也要使用String
+     */
     @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier("commonObjectMapper") ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -121,7 +127,9 @@ public class Config {
         return template;
     }
 
-    //spring缓存使用Redis
+    /**
+     * spring缓存使用Redis
+     */
     @Bean
     public RedisCacheManager redisCacheManager(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory redisConnectionFactory) {
         return new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
@@ -130,13 +138,19 @@ public class Config {
                 //指定cacheNames自定义过期时间
                 this.getRedisCacheConfigurationMap(redisTemplate));
     }
-    //修改特定cacheNames的缓存时间
+
+    /**
+     * 修改特定cacheNames的缓存时间
+     */
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap(RedisTemplate<String, Object> redisTemplate) {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
         redisCacheConfigurationMap.put("user", this.getRedisCacheConfigurationWithTtl(3000L,redisTemplate));
         return redisCacheConfigurationMap;
     }
-    //redis缓存配置
+
+    /**
+     *  redis缓存配置
+     */
     private RedisCacheConfiguration getRedisCacheConfigurationWithTtl(Long seconds,RedisTemplate<String, Object> redisTemplate) {
         return RedisCacheConfiguration.defaultCacheConfig()
                 //使用RedisTemplate的Jackson序列化
@@ -148,6 +162,9 @@ public class Config {
                 .computePrefixWith((x)->String.format("cache:%s:",x));
     }
 
+    /**
+     * rest Http请求工具
+     */
     @Bean
     public RestTemplate restTemplate(ClientHttpRequestFactory factory) {
         RestTemplate restTemplate = new RestTemplate(factory);
@@ -160,6 +177,9 @@ public class Config {
         return restTemplate;
     }
 
+    /**
+     * rest Http连接池
+     */
     @Bean
     public ClientHttpRequestFactory simpleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -168,8 +188,13 @@ public class Config {
         return factory;
     }
 
-
-    //rabbitMQ和RabbitListener序列化使用jackson
+    /**
+     * rabbitMQ和RabbitListener序列化使用jackson
+     * @param connectionFactory mq连接工厂
+     * @param rabbitTemplate    rabbit模板工具
+     * @param objectMapper      Jackson序列化mapper
+     * @param rabbitCallback    失败策略
+     */
     @Bean
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate,
                                                                             @Qualifier("commonObjectMapper") ObjectMapper objectMapper,RabbitCallback rabbitCallback){
@@ -192,8 +217,11 @@ public class Config {
     }
 
 
-    //Converter无法使用lambda注入bean,当前spring5.1.3
-    //入参yyyy-MM-dd HH:mm:ss接收Date
+    /**
+     * Converter无法使用lambda注入bean,等待spring优化
+     * jdk8时间入参必须加@RequestParam,因为时间类无法new,等待spring优化
+     * 入参yyyy-MM-dd HH:mm:ss接收Date
+     */
     @Bean
     public Converter<String,Date> dateConverter(){
         return new Converter<String, Date>() {
@@ -212,7 +240,10 @@ public class Config {
         };
     }
 
-    //入参yyyy-MM-dd HH:mm:ss接收LocalDateTime
+
+    /**
+     * 入参yyyy-MM-dd HH:mm:ss接收LocalDateTime
+     */
     @Bean
     public Converter<String, LocalDateTime> LocalDateTimeConvert() {
         return new Converter<String, LocalDateTime>() {
@@ -227,7 +258,9 @@ public class Config {
         };
     }
 
-    //入参yyyy-MM-dd接收为LocalDate
+    /**
+     * 入参yyyy-MM-dd接收为LocalDate
+     */
     @Bean
     public Converter<String,LocalDate> localDateConverter(){
         return new Converter<String, LocalDate>() {
@@ -241,7 +274,10 @@ public class Config {
             }
         };
     }
-    //入参HH:mm:ss接收为LocalTime
+
+    /**
+     * 入参HH:mm:ss接收为LocalTime
+     */
     @Bean
     public Converter<String,LocalTime> localTimeConverter(){
         return new Converter<String, LocalTime>() {

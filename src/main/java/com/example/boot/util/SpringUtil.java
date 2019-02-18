@@ -31,8 +31,8 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
     private static RabbitTemplate rabbitTemplate;
 
     /**
-     *  用于发送 rabbitMQ , 包装一层CorrelationInfo。
-     *  CorrelationInfo继承于CorrelationData,主要作用是由于
+     *  用于发送 rabbitMQ , 包装一层CorrelationMessage。
+     *  CorrelationMessage继承于CorrelationData,主要作用是由于
      *  消息发送到 exchange失败时无法获取发送消息,而CorrelationData只能设置一个id
      *  本项目MQ从 1、发送端到exchange交换器 2、exchange到queue队列 失败时，记录数据库
      *             3、queue队列到消费端失败采用手动ack应答
@@ -48,8 +48,8 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
         String uuid = UUID.randomUUID().toString();
         messageProperties.setMessageId(uuid);
         Message message = rabbitTemplate.getMessageConverter().toMessage(object,messageProperties );
-        CorrelationMessage correlationInfo = new CorrelationMessage(exchange,routingKey,message.getBody(),uuid);
-        rabbitTemplate.send(exchange,routingKey,message,correlationInfo);
+        CorrelationMessage correlationMessage = new CorrelationMessage(exchange,routingKey,message.getBody(),uuid);
+        rabbitTemplate.send(exchange,routingKey,message,correlationMessage);
     }
 
     /**
