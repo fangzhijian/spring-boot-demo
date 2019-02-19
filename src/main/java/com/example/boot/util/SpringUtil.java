@@ -147,7 +147,7 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
                 Property property = field.getAnnotation(Property.class);
                 String propertyValue = SpringUtil.getProperty(property.value(),property.check());
                 if (propertyValue == null){
-                    return;
+                    continue;
                 }
                 setField(bean,field,propertyValue);
             }
