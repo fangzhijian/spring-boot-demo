@@ -46,8 +46,8 @@ public class MqListener {
     /**
      *  用于接收用户服务更新会员身份同步俱乐部用户身份的队列
      */
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue("club-memberType"),
-            exchange = @Exchange(value = "club-exchange",type = "topic"),key = "club.memberType")})
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue("club.memberType"),
+            exchange = @Exchange(value = "party",type = "topic"),key = "member.update")})
     public void test(String json, Channel channel,@Header(AmqpHeaders.DELIVERY_TAG)long tag) throws IOException {
         log.info("年轻人好生心浮气躁1:{}",json);
         channel.basicAck(tag,false);

@@ -22,6 +22,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -196,6 +197,7 @@ public class Config {
      * @param rabbitCallback    失败策略
      */
     @Bean
+    @ConditionalOnBean(RabbitCallback.class)
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate,
                                                                             @Qualifier("commonObjectMapper") ObjectMapper objectMapper,RabbitCallback rabbitCallback){
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
