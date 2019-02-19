@@ -16,7 +16,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringValueResolver;
 import java.lang.reflect.Field;
-import java.util.UUID;
 
 /**
  * 2019/1/31 17:33
@@ -45,10 +44,10 @@ public class SpringUtil implements EmbeddedValueResolverAware,ApplicationContext
      */
     public static void sendRabbitMQ(String exchange, String routingKey, final Object object){
         MessageProperties messageProperties = new MessageProperties();
-        String uuid = UUID.randomUUID().toString();
-        messageProperties.setMessageId(uuid);
+        //messageId=0表示新发送的消息,还未失败,未进行获取自增失败id
+        messageProperties.setMessageId("0");
         Message message = rabbitTemplate.getMessageConverter().toMessage(object,messageProperties );
-        CorrelationMessage correlationMessage = new CorrelationMessage(exchange,routingKey,message.getBody(),uuid);
+        CorrelationMessage correlationMessage = new CorrelationMessage(exchange,routingKey,message.getBody(),"0");
         rabbitTemplate.send(exchange,routingKey,message,correlationMessage);
     }
 

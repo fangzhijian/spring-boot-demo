@@ -7,7 +7,6 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class RabbitCallback implements RabbitTemplate.ConfirmCallback,RabbitTemp
         if (message!= null){
             String body = new String(message.getBody());
             String messageId = message.getMessageProperties().getMessageId();
-            log.error("交换器发送到队列失败,messageId={},exchange={},routingKey={},body={},由于{}",message,exchange,routingKey,body,replyText);
+            log.error("交换器发送到队列失败,messageId={},exchange={},routingKey={},body={},由于{}",messageId,exchange,routingKey,body,replyText);
             //异步记录到数据库,并用定时任务去扫描重发,并设置重发次数
             saveFailedMqToRedis(messageId,exchange,routingKey,body,replyText);
         }

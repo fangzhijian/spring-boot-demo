@@ -40,6 +40,7 @@ public class RabbitRetryTask {
     @Scheduled(cron="0 * * * * ?")
     @Async
     public void resendMq(){
+        log.info("开始定时扫描rabbit mq发送失败的消息队列");
         //获取发送失败的mq
         Set<String> keys = redisTemplate.keys(String.format(RedisConstants.RABBIT_RETYR_KEY,"*"));
         if (keys != null && !keys.isEmpty()){

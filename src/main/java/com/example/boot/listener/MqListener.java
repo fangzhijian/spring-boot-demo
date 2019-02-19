@@ -15,7 +15,6 @@ import java.io.IOException;
 /**
  * 2019/1/23 16:45
  * 走路呼呼带风
- * RabbitListener
  */
 @Component
 @Slf4j

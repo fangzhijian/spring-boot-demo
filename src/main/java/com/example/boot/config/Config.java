@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
@@ -46,7 +47,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -66,6 +66,7 @@ import java.util.TimeZone;
 @MapperScan(basePackages = "com.example.boot.mapper",annotationClass = Repository.class)
 @PropertySource({"${config.path}/base.properties"})
 @Slf4j
+@Import(RabbitCallback.class)
 public class Config {
 
     /**
@@ -199,7 +200,7 @@ public class Config {
     @Bean
     @ConditionalOnBean(RabbitCallback.class)
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate,
-                                                                            @Qualifier("commonObjectMapper") ObjectMapper objectMapper,RabbitCallback rabbitCallback){
+                                                                            @Qualifier("commonObjectMapper") ObjectMapper objectMapper, RabbitCallback rabbitCallback){
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         //使用jackson序列化
         Jackson2JsonMessageConverter messageConverter = new Jackson2JsonMessageConverter(objectMapper);
