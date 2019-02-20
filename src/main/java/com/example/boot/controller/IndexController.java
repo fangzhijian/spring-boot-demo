@@ -200,6 +200,7 @@ public class IndexController {
     @ResponseBody
     public String efg(String id,String name,Date createTime){
         log.info("id,{}",createTime);
+        log.info("我叫猪小明");
         return name;
     }
 
