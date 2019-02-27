@@ -45,10 +45,10 @@ spring:
         login-username: root
         login-password: root
   rabbitmq:
-    host: 10.0.0.43
+    host: 10.0.0.47
     port: 5672
-    username: root
-    password: root
+    username: guest
+    password: guest
     virtual-host: /
     publisher-confirms: true
     publisher-returns: true
