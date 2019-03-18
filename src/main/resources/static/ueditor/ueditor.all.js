@@ -11105,7 +11105,18 @@ UE.commands['imagefloat'] = {
  * }] );
  * ```
  */
-
+function getImageWidth(url,callback){
+    var img = new Image();
+    img.src = url;
+    // 如果图片被缓存，则直接返回缓存数据
+    if(img.complete){
+        callback(img.width, img.height);
+    }else{
+        img.onload = function(){
+            callback(img.width, img.height);
+        }
+    }
+}
 UE.commands['insertimage'] = {
     execCommand:function (cmd, opt) {
 
@@ -11157,26 +11168,41 @@ UE.commands['insertimage'] = {
                 range.setStartAfter(img).setCursor(false, true);
                 me.execCommand('insertimage', opt);
             }
-
+            me.fireEvent('afterinsertimage', opt)
         } else {
             var html = [], str = '', ci;
             ci = opt[0];
             if (opt.length == 1) {
                 unhtmlData(ci);
-
-                str = '<img src="' + ci.src + '" ' + (ci._src ? ' _src="' + ci._src + '" ' : '') +
-                    (ci.width ? 'width="' + ci.width + '" ' : '') +
-                    (ci.height ? ' height="' + ci.height + '" ' : '') +
-                    (ci['floatStyle'] == 'left' || ci['floatStyle'] == 'right' ? ' style="float:' + ci['floatStyle'] + ';"' : '') +
-                    (ci.title && ci.title != "" ? ' title="' + ci.title + '"' : '') +
-                    (ci.border && ci.border != "0" ? ' border="' + ci.border + '"' : '') +
-                    (ci.alt && ci.alt != "" ? ' alt="' + ci.alt + '"' : '') +
-                    (ci.hspace && ci.hspace != "0" ? ' hspace = "' + ci.hspace + '"' : '') +
-                    (ci.vspace && ci.vspace != "0" ? ' vspace = "' + ci.vspace + '"' : '') + '/>';
-                if (ci['floatStyle'] == 'center') {
-                    str = '<p style="text-align: center">' + str + '</p>';
-                }
-                html.push(str);
+                getImageWidth(ci.src,function(w,h){
+                   if(w>764){
+                       str = '<img src="' + ci.src + '" ' + (ci._src ? ' _src="' + ci._src + '" ' : '') +
+                           (ci.width ? 'width="' + ci.width + '" ' : 'width="764"') +
+                           (ci.height ? ' height="' + ci.height + '" ' : '') +
+                           (ci['floatStyle'] == 'left' || ci['floatStyle'] == 'right' ? ' style="float:' + ci['floatStyle'] + ';"' : '') +
+                           (ci.title && ci.title != "" ? ' title="' + ci.title + '"' : '') +
+                           (ci.border && ci.border != "0" ? ' border="' + ci.border + '"' : '') +
+                           (ci.alt && ci.alt != "" ? ' alt="' + ci.alt + '"' : '') +
+                           (ci.hspace && ci.hspace != "0" ? ' hspace = "' + ci.hspace + '"' : '') +
+                           (ci.vspace && ci.vspace != "0" ? ' vspace = "' + ci.vspace + '"' : '') + '/>';
+                   }else{
+                       str = '<img src="' + ci.src + '" ' + (ci._src ? ' _src="' + ci._src + '" ' : '') +
+                           (ci.width ? 'width="' + ci.width + '" ' : '') +
+                           (ci.height ? ' height="' + ci.height + '" ' : '') +
+                           (ci['floatStyle'] == 'left' || ci['floatStyle'] == 'right' ? ' style="float:' + ci['floatStyle'] + ';"' : '') +
+                           (ci.title && ci.title != "" ? ' title="' + ci.title + '"' : '') +
+                           (ci.border && ci.border != "0" ? ' border="' + ci.border + '"' : '') +
+                           (ci.alt && ci.alt != "" ? ' alt="' + ci.alt + '"' : '') +
+                           (ci.hspace && ci.hspace != "0" ? ' hspace = "' + ci.hspace + '"' : '') +
+                           (ci.vspace && ci.vspace != "0" ? ' vspace = "' + ci.vspace + '"' : '') + '/>';
+                   }
+                    if (ci['floatStyle'] == 'center') {
+                        str = '<p style="text-align: center">' + str + '</p>';
+                    }
+                    html.push(str);
+                    me.execCommand('insertHtml', html.join(''));
+                    me.fireEvent('afterinsertimage', opt)
+                });
 
             } else {
                 for (var i = 0; ci = opt[i++];) {
@@ -11189,12 +11215,11 @@ UE.commands['insertimage'] = {
                         (ci.title ? ' title="' + ci.title + '"' : '') + ' /></p>';
                     html.push(str);
                 }
+                me.execCommand('insertHtml', html.join(''));
+                me.fireEvent('afterinsertimage', opt)
             }
 
-            me.execCommand('insertHtml', html.join(''));
         }
-
-        me.fireEvent('afterinsertimage', opt)
     }
 };
 
@@ -23225,7 +23250,11 @@ UE.plugins['catchremoteimage'] = function () {
             }
             var src = ci.getAttribute("_src") || ci.src || "";
             if (/^(https?|ftp):/i.test(src) && !test(src, catcherLocalDomain)) {
-                remoteImages.push(src);
+                if(src.indexOf("?")>-1){
+                    remoteImages.push(src.split("?")[0]);
+                }else{
+                    remoteImages.push(src);
+                }
             }
         }
 
@@ -24523,21 +24552,30 @@ UE.plugin.register('simpleupload', function (){
                         json = (new Function("return " + result))();
                         link = me.options.imageUrlPrefix + json.url;
                         if(json.state == 'SUCCESS' && json.url) {
-                            loader = me.document.getElementById(loadingId);
-                            loader.setAttribute('src', link);
-                            loader.setAttribute('_src', link);
-                            loader.setAttribute('title', json.title || '');
-                            loader.setAttribute('alt', json.original || '');
-                            loader.removeAttribute('id');
-                            domUtils.removeClasses(loader, 'loadingclass');
+                            getImageWidth(link,function(w,h){
+                                loader = me.document.getElementById(loadingId);
+                                loader.setAttribute('src', link);
+                                loader.setAttribute('_src', link);
+                                if(w>764){
+                                    loader.setAttribute('width', '764');
+                                }
+                                loader.setAttribute('title', json.title || '');
+                                loader.setAttribute('alt', json.original || '');
+                                loader.removeAttribute('id');
+                                domUtils.removeClasses(loader, 'loadingclass');
+                                form.reset();
+                                domUtils.un(iframe, 'load', callback);
+                            })
                         } else {
                             showErrorLoader && showErrorLoader(json.state);
+                            form.reset();
+                            domUtils.un(iframe, 'load', callback);
                         }
                     }catch(er){
                         showErrorLoader && showErrorLoader(me.getLang('simpleupload.loadError'));
+                        form.reset();
+                        domUtils.un(iframe, 'load', callback);
                     }
-                    form.reset();
-                    domUtils.un(iframe, 'load', callback);
                 }
                 function showErrorLoader(title){
                     if(loadingId) {
@@ -24562,6 +24600,11 @@ UE.plugin.register('simpleupload', function (){
                     fileext = filename ? filename.substr(filename.lastIndexOf('.')):'';
                 if (!fileext || (allowFiles && (allowFiles.join('') + '.').indexOf(fileext.toLowerCase() + '.') == -1)) {
                     showErrorLoader(me.getLang('simpleupload.exceedTypeError'));
+                    return;
+                }
+                 var   imageMaxSize = me.getOpt('imageMaxSize');
+                if(input.files[0].size>imageMaxSize){
+                    showErrorLoader(me.getLang('simpleupload.exceedSizeError'));
                     return;
                 }
 
