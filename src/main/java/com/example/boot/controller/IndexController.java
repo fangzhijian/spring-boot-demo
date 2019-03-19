@@ -56,7 +56,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 2018/10/10 14:21
@@ -81,7 +80,6 @@ public class IndexController {
         this.redisTemplate = redisTemplate;
         this.applicationContext = applicationContext;
     }
-
 
     @GetMapping("test2")
     @ResponseBody
@@ -205,170 +203,156 @@ public class IndexController {
     }
 
 
-    @RequestMapping(value = "upload",method =RequestMethod.POST)
-    @ResponseBody
-    public Map<String,Object> upload(@RequestParam MultipartFile file) throws IOException, BusinessException {
-        Map<String,Object> map = new HashMap<>();
-        map.put("state","SUCCESS");
-        map.put("title",file.getOriginalFilename());
-        map.put("url","http://res.outdoorclub.com.cn/p3/club/article/2018/7/17/6304230/54077/15320627454087621.gif");
-        return map;
-    }
     @RequestMapping(value = "uploadVideo",method =RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> uploadVideo(@RequestParam MultipartFile file) throws IOException, BusinessException {
-        Map<String,Object> map = new HashMap<>();
-        map.put("state","SUCCESS");
-        map.put("title",file.getOriginalFilename());
-        map.put("url","http://res.outdoorclub.com.cn/p3/club/videoCourse/2018/10/31/1/224618/15409971782003872.mp4");
-        return map;
-//        if (file == null || file.isEmpty()){
-//            return InfoJson.setFailed(PubError.P2001_PARAM_LACK.code(),"请选择一个excel上传");
-//        }
-//        String fileName = file.getOriginalFilename();
-//        if (fileName == null || (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$"))) {
-//            throw new BusinessException("上传文件格式不正确");
-//        }
-//        boolean isExcel2003 = true;
-//        if (fileName.matches("^.+\\.(?i)(xlsx)$")) {
-//            isExcel2003 = false;
-//        }
-//        InputStream inputStream = file.getInputStream();
-//        Workbook workbook;
-//        if (isExcel2003) {
-//            workbook = new HSSFWorkbook(inputStream);
-//        } else {
-//            workbook = new XSSFWorkbook(inputStream);
-//        }
-//        Sheet sheet = workbook.getSheetAt(0);
-//        int totalRow = sheet.getLastRowNum();
-//        log.info("总行数:{},开始导入数据到数据库",totalRow);
-//        for (int i = 1; i <totalRow+1 ; i++) {
-//            Row row = sheet.getRow(i);
-//            if (row == null){
-//                continue;
-//            }
-//            AnnualData data = new AnnualData();
-//            Cell cell1 =  row.getCell(0);
-//            if (cell1 == null){
-//                continue;
-//            }
-//            Integer userId = Double.valueOf(cell1.getNumericCellValue()).intValue();
-//            data.setUserId(userId);
-//
-//            Cell cell2 =  row.getCell(1);
-//            if (cell2 != null && cell2.getCellType() == Cell.CELL_TYPE_STRING){
-//                data.setPortrait(cell2.getStringCellValue());
-//            }
-//
-//            Cell cell3 =  row.getCell(2);
-//            if (cell3 != null){
-//                if (cell3.getCellType() == Cell.CELL_TYPE_STRING){
-//                    data.setNickName(cell3.getStringCellValue());
-//                }else if (cell3.getCellType() == Cell.CELL_TYPE_NUMERIC){
-//                    data.setNickName(String.valueOf(cell3.getNumericCellValue()));
-//                }
-//            }
-//            Cell cell4 =  row.getCell(3);
-//            if (cell4 != null){
-//                data.setCreateTime(cell4.getDateCellValue());
-//            }
-//            Cell cell5 =  row.getCell(4);
-//            if (cell5 != null){
-//                data.setUpgradeTime(cell5.getDateCellValue());
-//            }
-//            Cell cell6 =  row.getCell(5);
-//            if (cell6 != null){
-//                data.setSignInNum(Double.valueOf(cell6.getNumericCellValue()).intValue());
-//            }
-//            Cell cell7 =  row.getCell(6);
-//            if (cell7 != null){
-//                data.setSignIntegral(Double.valueOf(cell7.getNumericCellValue()).intValue());
-//            }
-//            Cell cell8 = row.getCell(7);
-//            if (cell8 != null){
-//                data.setShopPercent(new BigDecimal(cell8.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
-//            }else {
-//                data.setShopPercent(new BigDecimal(23.66).setScale(2,BigDecimal.ROUND_HALF_EVEN));
-//            }
-//            Cell cell9 = row.getCell(8);
-//            if (cell9 != null){
-//                data.setFansNum(Double.valueOf(cell9.getNumericCellValue()).intValue());
-//            }
-//            Cell cell10 = row.getCell(9);
-//            if (cell10 != null){
-//                data.setOrderNum(Double.valueOf(cell10.getNumericCellValue()).intValue());
-//            }
-//            Cell cell11 = row.getCell(10);
-//            if (cell11 != null){
-//                data.setSaleroom(new BigDecimal(cell11.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
-//            }
-//            Cell cell12 = row.getCell(11);
-//            if (cell12 != null){
-//                data.setAnnualIntegral(Double.valueOf(cell12.getNumericCellValue()).intValue());
-//            }
-//            Cell cell13 = row.getCell(12);
-//            if (cell13 != null){
-//                data.setCreateClubTime(cell13.getDateCellValue());
-//            }
-//            Cell cell14 = row.getCell(13);
-//            if (cell14 != null){
-//                data.setArticleNum(Double.valueOf(cell14.getNumericCellValue()).intValue());
-//            }
-//            Cell cell15 = row.getCell(14);
-//            if (cell15 != null){
-//                data.setArticleView(Double.valueOf(cell15.getNumericCellValue()).intValue());
-//            }
-//            Cell cell16 = row.getCell(15);
-//            if (cell16 != null){
-//                data.setActivityNum(Double.valueOf(cell16.getNumericCellValue()).intValue());
-//            }
-//            Cell cell17 = row.getCell(16);
-//            if (cell17 != null){
-//                data.setActivityView(Double.valueOf(cell17.getNumericCellValue()).intValue());
-//            }
-//            Cell cell18 = row.getCell(17);
-//            if (cell18 != null){
-//                data.setActivityApplyNum(Double.valueOf(cell18.getNumericCellValue()).intValue());
-//            }
-//            Cell cell19 = row.getCell(18);
-//            if (cell19 != null){
-//                data.setInviteShop(Double.valueOf(cell19.getNumericCellValue()).intValue());
-//            }
-//            Cell cell20 = row.getCell(19);
-//            if (cell20 != null){
-//                data.setShopIntegral(Double.valueOf(cell20.getNumericCellValue()).intValue());
-//            }
-//            Cell cell21 = row.getCell(20);
-//            if (cell21 != null){
-//                data.setTopSaleDay(cell21.getStringCellValue());
-//            }
-//            Cell cell22 = row.getCell(21);
-//            if (cell22 != null){
-//                data.setTopSaleroom(new BigDecimal(cell22.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
-//            }
-//            Cell cell23 = row.getCell(22);
-//            if (cell23 != null){
-//                data.setTopOrderNum(Double.valueOf(cell23.getNumericCellValue()).intValue());
-//            }
-//            Cell cell24 = row.getCell(23);
-//            if (cell24 != null){
-//                data.setMemberType(Double.valueOf(cell24.getNumericCellValue()).intValue());
-//            }
-//            Cell cell25 = row.getCell(24);
-//            if (cell25 != null){
-//                data.setSaleroomPercent(new BigDecimal(cell25.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
-//            }else {
-//                data.setSaleroomPercent(new BigDecimal("32.28").setScale(2,BigDecimal.ROUND_HALF_EVEN));
-//            }
-//            Cell cell26 = row.getCell(25);
-//            if (cell26 != null){
-//                data.setLabel(Double.valueOf(cell26.getNumericCellValue()).intValue());
-//            }
-//            log.info(data.toString());
-//            redisTemplate.opsForValue().set(String.format("annualData:%s",userId),data);
-//        }
-//        return InfoJson.getSuccess();
+    public InfoJson uploadVideo(@RequestParam MultipartFile file) throws IOException, BusinessException {
+        if (file == null || file.isEmpty()){
+            return InfoJson.setFailed(PubError.P2001_PARAM_LACK.code(),"请选择一个excel上传");
+        }
+        String fileName = file.getOriginalFilename();
+        if (fileName == null || (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$"))) {
+            throw new BusinessException("上传文件格式不正确");
+        }
+        boolean isExcel2003 = true;
+        if (fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            isExcel2003 = false;
+        }
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook;
+        if (isExcel2003) {
+            workbook = new HSSFWorkbook(inputStream);
+        } else {
+            workbook = new XSSFWorkbook(inputStream);
+        }
+        Sheet sheet = workbook.getSheetAt(0);
+        int totalRow = sheet.getLastRowNum();
+        log.info("总行数:{},开始导入数据到数据库",totalRow);
+        for (int i = 1; i <totalRow+1 ; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null){
+                continue;
+            }
+            AnnualData data = new AnnualData();
+            Cell cell1 =  row.getCell(0);
+            if (cell1 == null){
+                continue;
+            }
+            Integer userId = Double.valueOf(cell1.getNumericCellValue()).intValue();
+            data.setUserId(userId);
+
+            Cell cell2 =  row.getCell(1);
+            if (cell2 != null && cell2.getCellType() == Cell.CELL_TYPE_STRING){
+                data.setPortrait(cell2.getStringCellValue());
+            }
+
+            Cell cell3 =  row.getCell(2);
+            if (cell3 != null){
+                if (cell3.getCellType() == Cell.CELL_TYPE_STRING){
+                    data.setNickName(cell3.getStringCellValue());
+                }else if (cell3.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                    data.setNickName(String.valueOf(cell3.getNumericCellValue()));
+                }
+            }
+            Cell cell4 =  row.getCell(3);
+            if (cell4 != null){
+                data.setCreateTime(cell4.getDateCellValue());
+            }
+            Cell cell5 =  row.getCell(4);
+            if (cell5 != null){
+                data.setUpgradeTime(cell5.getDateCellValue());
+            }
+            Cell cell6 =  row.getCell(5);
+            if (cell6 != null){
+                data.setSignInNum(Double.valueOf(cell6.getNumericCellValue()).intValue());
+            }
+            Cell cell7 =  row.getCell(6);
+            if (cell7 != null){
+                data.setSignIntegral(Double.valueOf(cell7.getNumericCellValue()).intValue());
+            }
+            Cell cell8 = row.getCell(7);
+            if (cell8 != null){
+                data.setShopPercent(new BigDecimal(cell8.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }else {
+                data.setShopPercent(new BigDecimal(23.66).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }
+            Cell cell9 = row.getCell(8);
+            if (cell9 != null){
+                data.setFansNum(Double.valueOf(cell9.getNumericCellValue()).intValue());
+            }
+            Cell cell10 = row.getCell(9);
+            if (cell10 != null){
+                data.setOrderNum(Double.valueOf(cell10.getNumericCellValue()).intValue());
+            }
+            Cell cell11 = row.getCell(10);
+            if (cell11 != null){
+                data.setSaleroom(new BigDecimal(cell11.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }
+            Cell cell12 = row.getCell(11);
+            if (cell12 != null){
+                data.setAnnualIntegral(Double.valueOf(cell12.getNumericCellValue()).intValue());
+            }
+            Cell cell13 = row.getCell(12);
+            if (cell13 != null){
+                data.setCreateClubTime(cell13.getDateCellValue());
+            }
+            Cell cell14 = row.getCell(13);
+            if (cell14 != null){
+                data.setArticleNum(Double.valueOf(cell14.getNumericCellValue()).intValue());
+            }
+            Cell cell15 = row.getCell(14);
+            if (cell15 != null){
+                data.setArticleView(Double.valueOf(cell15.getNumericCellValue()).intValue());
+            }
+            Cell cell16 = row.getCell(15);
+            if (cell16 != null){
+                data.setActivityNum(Double.valueOf(cell16.getNumericCellValue()).intValue());
+            }
+            Cell cell17 = row.getCell(16);
+            if (cell17 != null){
+                data.setActivityView(Double.valueOf(cell17.getNumericCellValue()).intValue());
+            }
+            Cell cell18 = row.getCell(17);
+            if (cell18 != null){
+                data.setActivityApplyNum(Double.valueOf(cell18.getNumericCellValue()).intValue());
+            }
+            Cell cell19 = row.getCell(18);
+            if (cell19 != null){
+                data.setInviteShop(Double.valueOf(cell19.getNumericCellValue()).intValue());
+            }
+            Cell cell20 = row.getCell(19);
+            if (cell20 != null){
+                data.setShopIntegral(Double.valueOf(cell20.getNumericCellValue()).intValue());
+            }
+            Cell cell21 = row.getCell(20);
+            if (cell21 != null){
+                data.setTopSaleDay(cell21.getStringCellValue());
+            }
+            Cell cell22 = row.getCell(21);
+            if (cell22 != null){
+                data.setTopSaleroom(new BigDecimal(cell22.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }
+            Cell cell23 = row.getCell(22);
+            if (cell23 != null){
+                data.setTopOrderNum(Double.valueOf(cell23.getNumericCellValue()).intValue());
+            }
+            Cell cell24 = row.getCell(23);
+            if (cell24 != null){
+                data.setMemberType(Double.valueOf(cell24.getNumericCellValue()).intValue());
+            }
+            Cell cell25 = row.getCell(24);
+            if (cell25 != null){
+                data.setSaleroomPercent(new BigDecimal(cell25.getNumericCellValue()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }else {
+                data.setSaleroomPercent(new BigDecimal("32.28").setScale(2,BigDecimal.ROUND_HALF_EVEN));
+            }
+            Cell cell26 = row.getCell(25);
+            if (cell26 != null){
+                data.setLabel(Double.valueOf(cell26.getNumericCellValue()).intValue());
+            }
+            log.info(data.toString());
+            redisTemplate.opsForValue().set(String.format("annualData:%s",userId),data);
+        }
+        return InfoJson.getSuccess();
     }
 
     @RequestMapping("test5")
@@ -415,4 +399,11 @@ public class IndexController {
         userMapper.updateUser(user);
         applicationContext.publishEvent(new MyApplicationEvent(user));
     }
+
+    @GetMapping("test10")
+    @ResponseBody
+    public void test10(){
+        redisTemplate.opsForValue().set("abc","猪大肠");
+    }
+
 }

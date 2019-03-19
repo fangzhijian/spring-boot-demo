@@ -13,7 +13,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import io.lettuce.core.resource.ClientResources;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -23,6 +25,7 @@ import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -33,6 +36,12 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisNode;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -52,6 +61,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +125,7 @@ public class Config {
      * redis key值使用String类型,操作hash时map的key值也要使用String
      */
     @Bean(name = "redisTemplate")
+    @Primary
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier("commonObjectMapper") ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
@@ -126,6 +137,17 @@ public class Config {
         template.setKeySerializer(stringRedisSerializer);
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean(name = "redisTemplateDB3")
+    public RedisTemplate<String, Object> redisTemplateDB3(@Qualifier("lettuceConnectionDB3") RedisConnectionFactory redisConnectionFactory){
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        template.setHashKeySerializer(stringRedisSerializer);
+        template.setKeySerializer(stringRedisSerializer);
+        log.warn("redis db {}","3");
         return template;
     }
 
@@ -295,4 +317,76 @@ public class Config {
         };
     }
 
+    /**
+     *  使用Lettuce配置redis连接工厂1
+     */
+    @Bean(name = "LettuceConnectionFactory")
+    @Primary
+    public LettuceConnectionFactory lettuceConnectionFactory1(RedisProperties redisProperties){
+        return new LettuceConnectionFactory(getSentinelConfiguration(redisProperties,redisProperties.getDatabase()),
+                                            getClientConfiguration(redisProperties));
+    }
+
+    /**
+     *  使用Lettuce配置redis连接工厂2
+     */
+    @Bean(name = "lettuceConnectionDB3")
+    public LettuceConnectionFactory lettuceConnectionFactory2(RedisProperties redisProperties){
+        return new LettuceConnectionFactory(getSentinelConfiguration(redisProperties,3),
+                                            getClientConfiguration(redisProperties));
+    }
+
+    /**
+     *  配置哨兵节点信息
+     */
+    private RedisSentinelConfiguration getSentinelConfiguration(RedisProperties redisProperties,int database){
+        RedisProperties.Sentinel sentinelProperties = redisProperties.getSentinel();
+        RedisSentinelConfiguration config = new RedisSentinelConfiguration();
+        config.master(sentinelProperties.getMaster());
+        //设置节点
+        List<RedisNode> nodes = new ArrayList<>();
+        RedisProperties.Sentinel sentinel = redisProperties.getSentinel();
+        for (String node : sentinel.getNodes()) {
+            String[] parts = StringUtils.split(node, ":");
+            if (parts != null){
+                nodes.add(new RedisNode(parts[0], Integer.valueOf(parts[1])));
+            }
+        }
+        config.setSentinels(nodes);
+
+        if (redisProperties.getPassword() != null) {
+            config.setPassword(RedisPassword.of(redisProperties.getPassword()));
+        }
+        config.setDatabase(database);
+        return config;
+    }
+
+    /***
+     *  配置Lettuce连接池属性
+     */
+    private LettuceClientConfiguration getClientConfiguration(RedisProperties redisProperties){
+        GenericObjectPoolConfig<?> config = new GenericObjectPoolConfig<>();
+        RedisProperties.Pool properties = redisProperties.getLettuce().getPool();
+        config.setMaxTotal(properties.getMaxActive());
+        config.setMaxIdle(properties.getMaxIdle());
+        config.setMinIdle(properties.getMinIdle());
+        if (properties.getMaxWait() != null) {
+            config.setMaxWaitMillis(properties.getMaxWait().toMillis());
+        }
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettucePoolingClientConfiguration.builder()
+                .poolConfig(config);
+        if (redisProperties.isSsl()) {
+            builder.useSsl();
+        }
+        if (redisProperties.getTimeout() != null) {
+            builder.commandTimeout(redisProperties.getTimeout());
+        }
+        if (redisProperties.getLettuce() != null) {
+            RedisProperties.Lettuce lettuce = redisProperties.getLettuce();
+            if (lettuce.getShutdownTimeout() != null && !lettuce.getShutdownTimeout().isZero()) {
+                builder.shutdownTimeout(redisProperties.getLettuce().getShutdownTimeout());
+            }
+        }
+        return builder.build();
+    }
 }

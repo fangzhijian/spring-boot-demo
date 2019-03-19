@@ -54,9 +54,9 @@
             UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
             UE.Editor.prototype.getActionUrl = function(action) {
                 if (action == 'uploadImage') {
-                    return '/upload';
+                    return '/richImage';
                 } else if (action == 'uploadVideo'){
-                    return '/uploadVideo'
+                    return '/richVideo'
                 }
                 else {
                     return this._bkGetActionUrl.call(this, action);
