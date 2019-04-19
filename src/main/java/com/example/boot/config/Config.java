@@ -129,6 +129,7 @@ public class Config {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier("commonObjectMapper") ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
+        template.setEnableTransactionSupport(true);
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
@@ -144,6 +145,7 @@ public class Config {
     public RedisTemplate<String, Object> redisTemplateDB3(@Qualifier("lettuceConnectionDB3") RedisConnectionFactory redisConnectionFactory){
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
+        template.setEnableTransactionSupport(true);
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         template.setHashKeySerializer(stringRedisSerializer);
         template.setKeySerializer(stringRedisSerializer);
