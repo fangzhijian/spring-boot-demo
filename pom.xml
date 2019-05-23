@@ -93,6 +93,11 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.9</version>
 		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.54</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.lettuce/lettuce-core -->
 		<dependency>
 			<groupId>io.lettuce</groupId>
