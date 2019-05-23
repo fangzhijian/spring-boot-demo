@@ -1,6 +1,7 @@
 package com.example.boot.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,9 @@ import java.io.Serializable;
 @Data
 @ConfigurationProperties(prefix = "body")
 @Component
+@Accessors(chain = true)
 public class Body implements Serializable{
 
-    private Integer id;
+    private Long id;
     private String name;
 }
