@@ -1,6 +1,3 @@
-config:
-  path: classpath:config/test
-
 spring:
   redis:
     sentinel:
@@ -44,12 +41,12 @@ spring:
         reset-enable: true
         login-username: root
         login-password: root
-  rabbitmq:
-    host: 192.168.20.12
-    port: 5672
-    username: root
-    password: root
-    virtual-host: /
-    publisher-confirms: true
-    publisher-returns: true
+#  rabbitmq:
+#    host: 192.168.20.12
+#    port: 5672
+#    username: root
+#    password: root
+#    virtual-host: /
+#    publisher-confirms: true
+#    publisher-returns: true
 

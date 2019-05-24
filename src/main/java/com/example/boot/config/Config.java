@@ -13,7 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import io.lettuce.core.resource.ClientResources;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.mybatis.spring.annotation.MapperScan;
@@ -74,7 +73,7 @@ import java.util.TimeZone;
  */
 @Configuration
 @MapperScan(basePackages = "com.example.boot.mapper",annotationClass = Repository.class)
-@PropertySource({"${config.path}/base.properties"})
+@PropertySource({"classpath:config/${spring.profiles.active}/base.properties"})
 @Slf4j
 @Import(RabbitCallback.class)
 public class Config {
@@ -222,7 +221,7 @@ public class Config {
      * @param rabbitCallback    失败策略
      */
     @Bean
-    @ConditionalOnBean(RabbitCallback.class)
+    @ConditionalOnBean({RabbitCallback.class,RabbitTemplate.class,ConnectionFactory.class})
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate,
                                                                             @Qualifier("commonObjectMapper") ObjectMapper objectMapper, RabbitCallback rabbitCallback){
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
