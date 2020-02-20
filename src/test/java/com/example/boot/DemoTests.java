@@ -2,6 +2,8 @@ package com.example.boot;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.boot.model.Body;
+import com.example.boot.util.threadpool.NameThreadFactory;
+import com.example.boot.util.threadpool.ThreadPoolUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -9,6 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -28,6 +31,13 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 2019/5/21 20:14
@@ -49,6 +59,55 @@ public class DemoTests {
                 ((StringHttpMessageConverter) x).setDefaultCharset(Charset.forName("UTF-8"));
             }
         });
+    }
+
+    @Test
+    public void dingTalk(){
+        String webHook = "https://oapi.dingtalk.com/robot/send?access_token=031b19d1e6ae8d9e8a32e6a4e29ace3dfcd972a04ea56bc1cb8df70539d97870";
+        JSONObject json = new JSONObject();
+        //设置消息类型 text link markdown
+        json.put("msgtype","text");
+        //内容
+        JSONObject content = new JSONObject();
+        content.put("content","我是谁");
+        json.put("text",content);
+        //@人员
+        JSONObject atMobiles = new JSONObject();
+        List<Long> mobiles = new ArrayList<>();
+        mobiles.add(17682351001L);
+        atMobiles.put("atMobiles",mobiles.toArray());
+        atMobiles.put("isAtAll",false);
+        json.put("at",atMobiles);
+
+        ResponseEntity<String> stringResponseEntity = restTemplate.postForEntity(webHook, json, String.class);
+        System.out.println(stringResponseEntity);
+
+    }
+
+    @Test
+    public void testString(){
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(3, 5, 0, TimeUnit.MICROSECONDS, new LinkedBlockingQueue<>(),new NameThreadFactory("很好"));
+        int count = 7;
+        CountDownLatch countDownLatch = new CountDownLatch(count);
+        for (int i = 0; i <count ; i++) {
+            final int order = i;
+            threadPoolExecutor.submit(()->{
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    countDownLatch.countDown();
+                }
+                System.out.println(Thread.currentThread().getName()+" ,第"+order+"次循环");
+                countDownLatch.countDown();
+            });
+        }
+        try {
+            countDownLatch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
     }
 
 

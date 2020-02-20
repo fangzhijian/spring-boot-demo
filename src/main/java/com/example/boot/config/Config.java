@@ -3,6 +3,7 @@ package com.example.boot.config;
 import com.example.boot.listener.rabbit.RabbitCallback;
 import com.example.boot.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -86,6 +87,8 @@ public class Config {
         objectMapper.setDateFormat(DateUtil.yyyy_MM_ddHH_mm_ss);
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        //反序列化时json比model多余字段不会报错
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         //支持jdk8时间格式分别为yyyy-MM-dd HH:mm:ss,yyyy-MM-dd,HH:mm:ss
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DateUtil.DATE_TIME)));
