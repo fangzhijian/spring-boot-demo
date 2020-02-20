@@ -3,6 +3,7 @@ package com.example.boot.util;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -11,6 +12,10 @@ public class DateUtil {
 	public static final String DATE_TIME = "yyyy-MM-dd HH:mm:ss";
 	public static final String DATE = "yyyy-MM-dd";
 	public static final String TIME = "HH:mm:ss";
+
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME);
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE);
+	public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME);
 
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
 	public static SimpleDateFormat yyyy_MM_ddHH_mm_ss= new SimpleDateFormat(DATE_TIME);
