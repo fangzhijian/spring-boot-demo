@@ -5,6 +5,7 @@ import com.example.boot.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -89,6 +90,7 @@ public class Config {
         objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         //反序列化时json比model多余字段不会报错
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         //支持jdk8时间格式分别为yyyy-MM-dd HH:mm:ss,yyyy-MM-dd,HH:mm:ss
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateUtil.DATE_TIME_FORMATTER));
