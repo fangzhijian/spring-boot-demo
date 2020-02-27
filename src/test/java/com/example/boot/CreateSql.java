@@ -21,7 +21,7 @@ public class CreateSql {
     /**
      * sql脚本所在的绝对路径
      */
-    private static final String fileName = "E:\\workspace\\spring-boot\\src\\test\\java\\com\\example\\boot\\create.sql";
+    private static final String fileName = "E:\\workspace\\manage\\src\\test\\java\\com\\bs\\manage\\create.sql";
     /**
      * 是否要开启下划线转驼峰
      */
@@ -64,8 +64,8 @@ public class CreateSql {
     private static void insert(List<String> insertIgnore, List<ColumnAndType> columnAndTypes) {
         columnAndTypes.removeIf(next -> insertIgnore.contains(next.getColumn()));
         StringBuilder sb = new StringBuilder();
-        sb.append("<insert id=\"insert\" useGeneratedKeys=\"true\" keyProperty=\"id\">\n\t");
-        sb.append("insert into ").append(tableName).append("\n\t\t(");
+        sb.append("\t<insert id=\"insert\" useGeneratedKeys=\"true\" keyProperty=\"id\">\n\t\t");
+        sb.append("insert into ").append(tableName).append("\n\t\t\t(");
         int size = 0;
         for (ColumnAndType columnAndType : columnAndTypes) {
             size++;
@@ -73,11 +73,11 @@ public class CreateSql {
             if (size != columnAndTypes.size()) {
                 sb.append(",");
                 if (size % 5 == 0) {
-                    sb.append("\n\t\t");
+                    sb.append("\n\t\t\t");
                 }
             }
         }
-        sb.append(")\n\tvalues\n\t\t(");
+        sb.append(")\n\t\tvalues\n\t\t\t(");
         size = 0;
         for (ColumnAndType columnAndType : columnAndTypes) {
             size++;
@@ -85,26 +85,26 @@ public class CreateSql {
             if (size != columnAndTypes.size()) {
                 sb.append(",");
                 if (size % 5 == 0) {
-                    sb.append("\n\t\t");
+                    sb.append("\n\t\t\t");
                 }
             }
         }
-        sb.append(")\n</insert>");
+        sb.append(")\n\t</insert>");
         System.out.println(sb);
     }
 
     private static void delete() {
-        System.out.println(String.format("<delete id=\"delete\">\n\tdelete from %s where id = #{id}\n</delete>", tableName));
+        System.out.println(String.format("\t<delete id=\"delete\">\n\t\tdelete from %s where id = #{id}\n\t</delete>", tableName));
     }
 
     private static void deleteAsStatus(String statusName, String deleteTimeName) {
-        System.out.println(String.format("<update id=\"deleteAsStatus\">\n\tupdate %s set %s = 1,%s = #{%s} where id = #{id}\n</update>", tableName, statusName, deleteTimeName, deleteTimeName));
+        System.out.println(String.format("\t<update id=\"deleteAsStatus\">\n\t\tupdate %s set %s = 1,%s = #{%s} where id = #{id}\n\t</update>", tableName, statusName, deleteTimeName, deleteTimeName));
     }
 
     private static void update(List<String> updateIgnore, List<ColumnAndType> columnAndTypes) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<update id=\"update\">\n\t");
-        sb.append("update ").append(tableName).append("\n\t").append("<set>\n\t\t");
+        sb.append("\t<update id=\"update\">\n\t\t");
+        sb.append("update ").append(tableName).append("\n\t\t").append("<set>\n\t\t\t");
         for (ColumnAndType columnAndType : columnAndTypes) {
             if (updateIgnore.contains(columnAndType.getColumn())) {
                 continue;
@@ -113,43 +113,44 @@ public class CreateSql {
             if ("char".equals(columnAndType.getType()) || "varchar".equals(columnAndType.getType()) || "text".equals(columnAndType.getType())) {
                 sb.append(" and ").append(columnAndType.getColumn()).append(" !=''");
             }
-            sb.append(">\n\t\t\t").append(columnAndType.getColumn()).append(" = #{").append(isHump ? hump(columnAndType.getColumn()) : columnAndType.getColumn()).append("},\n\t\t</if>\n\t\t");
+            sb.append("\">\n\t\t\t\t").append(columnAndType.getColumn()).append(" = #{").append(isHump ? hump(columnAndType.getColumn()) : columnAndType.getColumn()).
+                    append("},\n\t\t\t</if>\n\t\t\t");
         }
-        sb.append("\n\twhere id = #{id}\n</update");
+        sb.append("\n\t\t</set>\n\t\twhere id = #{id}\n\t</update>");
         System.out.println(sb);
     }
 
     private static void getById(List<String> selectIgnore, List<ColumnAndType> columnAndTypes) {
         StringBuilder sb = getSelectColumn(selectIgnore, columnAndTypes, "getById");
-        sb.append("\n\twhere id = #{id}\n</select>");
+        sb.append("\n\t\twhere id = #{id}\n\t</select>");
         System.out.println(sb);
     }
 
     private static void getAll(List<String> selectIgnore, List<ColumnAndType> columnAndTypes) {
         StringBuilder sb = getSelectColumn(selectIgnore, columnAndTypes, "getAll");
-        sb.append("\n</select>");
+        sb.append("\n\t</select>");
         System.out.println(sb);
     }
 
     private static void getBySelectKey(List<String> selectIgnore, List<ColumnAndType> columnAndTypes) {
         StringBuilder sb = getSelectColumn(selectIgnore, columnAndTypes, "getBySelectKey");
-        sb.append("\n\twhere 1 = 1\n\t");
+        sb.append("\n\t\twhere 1 = 1\n\t\t");
         for (ColumnAndType columnAndType : columnAndTypes) {
             sb.append("<if test=\"").append(columnAndType.getColumn()).append(" != null");
             if ("char".equals(columnAndType.getType()) || "varchar".equals(columnAndType.getType()) || "text".equals(columnAndType.getType())) {
                 sb.append(" and ").append(columnAndType.getColumn()).append(" !=''");
             }
-            sb.append(">\n\t\tand ").append(columnAndType.getColumn()).append(" = #{").append(isHump ? hump(columnAndType.getColumn()) : columnAndType.getColumn()).append("}\n\t</if>\n\t");
+            sb.append("\">>\n\t\t\tand ").append(columnAndType.getColumn()).append(" = #{").append(isHump ? hump(columnAndType.getColumn()) : columnAndType.getColumn()).append("}\n\t\t</if>\n\t\t");
         }
-        sb.append("\n</select>");
+        sb.append("\n\t</select>");
         System.out.println(sb);
     }
 
     private static StringBuilder getSelectColumn(List<String> selectIgnore, List<ColumnAndType> columnAndTypes, String methName) {
         columnAndTypes.removeIf(next -> selectIgnore.contains(next.getColumn()));
         StringBuilder sb = new StringBuilder();
-        sb.append("<select id=\"").append(methName).append("\" resultType=\"").append(hump(tableName)).append("\">\n\t");
-        sb.append("select ");
+        sb.append("\t<select id=\"").append(methName).append("\" resultType=\"").append(hump(tableName)).append("\">\n\t\t");
+        sb.append("select\n\t\t\t");
         int size = 0;
         for (ColumnAndType columnAndType : columnAndTypes) {
             size++;
@@ -157,11 +158,11 @@ public class CreateSql {
             if (size != columnAndTypes.size()) {
                 sb.append(",");
                 if (size % 5 == 0) {
-                    sb.append("\n\t\t");
+                    sb.append("\n\t\t\t");
                 }
             }
         }
-        sb.append("\n\tfrom ").append(tableName);
+        sb.append("\n\t\tfrom ").append(tableName);
         return sb;
     }
 
