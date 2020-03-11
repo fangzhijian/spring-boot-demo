@@ -1,0 +1,20 @@
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '姓名',
+  `email` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '邮箱(登陆名)',
+  `password` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密码',
+  `api_token` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'token',
+  `role` int DEFAULT '1' COMMENT '角色 1-专员 2-管理员 3-推广',
+  `resources` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '指定权限',
+  `status` tinyint(1) DEFAULT '1' COMMENT '账号状态 1正常，2停用,3离职',
+  `team_id` bigint DEFAULT NULL COMMENT '团队id',
+  `parent_id` bigint DEFAULT NULL COMMENT '上级id,0表示最上级',
+  `tree_node` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '所在树节点的位置',
+  `has_child` tinyint(1) DEFAULT '0' COMMENT '是否有下级 0-没有 1-有',
+  `position` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '岗位名称',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  `delete_time` timestamp NULL DEFAULT NULL COMMENT '删除时间',
+  `delete_status` tinyint(1) DEFAULT '0' COMMENT '删除状态 0-未删除 1-已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
