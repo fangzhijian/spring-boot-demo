@@ -24,6 +24,7 @@
         <!-- 对日志进行格式化,给控制台上颜色 -->
         <encoder>
             <pattern> %boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
@@ -53,6 +54,7 @@
         </rollingPolicy>
         <encoder>
             <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldRed(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
@@ -80,6 +82,7 @@
         </rollingPolicy>
         <encoder>
             <pattern>%boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %boldYellow(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
@@ -104,6 +107,7 @@
         </rollingPolicy>
         <encoder>
             <pattern> %boldBlue(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %logger{0} %cyan(-%msg%n)</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 

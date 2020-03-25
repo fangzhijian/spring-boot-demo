@@ -16,10 +16,9 @@ mybatis:
   mapper-locations: mybatis/**/*Mapper.xml
   #开启多个别名
   type-aliases-package: com.example.boot.model;com.example.boot.openResult
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl   #日志级别能被logback所控制
-    cache-enabled: true                                     #开启二级缓存
-    map-underscore-to-camel-case: true                    #开启驼峰自动映射
+  configuration:                                          # dev中配置打印sql
+    cache-enabled: true                                   #开启二级缓存
+    map-underscore-to-camel-case: false                   #不开启驼峰自动映射,遵循php版本继续使用下划线
 server:
   port: 9000
   tomcat:

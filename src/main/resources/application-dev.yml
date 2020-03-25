@@ -1,3 +1,6 @@
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl    #打印sql debug日志
 spring:
   redis:
     sentinel:

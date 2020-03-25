@@ -25,7 +25,6 @@
     </appender>
 
     <logger name="com.alibaba.dubbo" additivity="true" level="ERROR" />
-    <logger name="com.outdoor.club.mapper" value="DEBUG" />
 
     <!-- root级别 INFO -->
     <root level="INFO">

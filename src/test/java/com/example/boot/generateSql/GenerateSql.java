@@ -55,9 +55,9 @@ public class GenerateSql {
     }
 
     /*** 创建时间,没啥作用,就默认忽略时使用*/
-    private static final String CREATE_TIME_NAME = "create_time";
+    private static final String CREATE_TIME_NAME = "created_at";
     /*** 更新时间,没啥作用,就默认忽略时使用*/
-    private static final String UPDATE_TIME_NAME = "updated_time";
+    private static final String UPDATE_TIME_NAME = "updated_at";
     /*** 生成bean时需要忽略的成员变量,一般在父类中,例中字段没在父类中就删除掉*/
     private static final List<String> beanIgnore = Arrays.asList(idName, DELETE_TIME_NAME, DELETE_COLUMN_NAME, CREATE_TIME_NAME, UPDATE_TIME_NAME);
     /*** 新增忽略的字段*/
@@ -173,7 +173,7 @@ public class GenerateSql {
             for (int i = 0; i < spaceLength; i++) {
                 sb.append(" ");
             }
-            sb.append("//").append(columnAndType.getComment()).append("\n");
+            sb.append("//").append(columnAndType.getComment() == null?"":columnAndType.getComment()).append("\n");
         }
         System.out.println(sb.toString());
     }
@@ -377,7 +377,11 @@ public class GenerateSql {
         if (updateBatch) {
             sb.append("\t");
         }
-        sb.append("where ").append(idName).append(" = #{").append(setColumnIfHump(idName)).append("}");
+        sb.append("where ").append(idName).append(" = #{");
+        if (updateBatch){
+            sb.append("item.");
+        }
+        sb.append(setColumnIfHump(idName)).append("}");
         if (updateBatch) {
             sb.append("\n\t\t</foreach>");
         }
@@ -527,7 +531,7 @@ public class GenerateSql {
             throw new IOException("表名格式不正确");
         }
 
-        Pattern columnPattern = Pattern.compile("(?<=`)(\\w+)` +(int|tinyint|bigint|decimal|datetime|timestamp|float|double|char|varchar|text).*?COMMENT +'(.+)'");
+        Pattern columnPattern = Pattern.compile("(?<=`)(\\w+)` +(int|tinyint|bigint|decimal|datetime|timestamp|float|double|char|varchar|text)");
         Matcher columnMatcher = columnPattern.matcher(sql);
         List<ColumnAndType> columnAndTypes = new ArrayList<>();
         hasDeleteColumn = false;
@@ -536,7 +540,18 @@ public class GenerateSql {
             if (DELETE_COLUMN_NAME.equals(column)) {
                 hasDeleteColumn = true;
             }
-            columnAndTypes.add(new ColumnAndType().setColumn(column).setType(columnMatcher.group(2)).setComment(columnMatcher.group(3)));
+            columnAndTypes.add(new ColumnAndType().setColumn(column).setType(columnMatcher.group(2)));
+        }
+        //添加注释,因为有的column没注释,所有要分开添加
+        Pattern commentPattern = Pattern.compile("(?<=`)(\\w+)` +(int|tinyint|bigint|decimal|datetime|timestamp|float|double|char|varchar|text).*?COMMENT +'(.+)'");
+        Matcher commentMatch = commentPattern.matcher(sql);
+        while (commentMatch.find()){
+            String column = commentMatch.group(1);
+            for (ColumnAndType columnAndType:columnAndTypes){
+                if (columnAndType.getColumn().equals(column)){
+                    columnAndType.setComment(commentMatch.group(3));
+                }
+            }
         }
         Pattern idPattern = Pattern.compile("PRIMARY ?KEY ?\\(`(\\w+)`\\)");
         Matcher idMatcher = idPattern.matcher(sql);
