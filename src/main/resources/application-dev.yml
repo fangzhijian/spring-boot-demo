@@ -4,9 +4,9 @@ mybatis:
 spring:
   redis:
     sentinel:
-      master: sessmaster
-      nodes: 192.168.0.2:26633
-    password: CottonXu
+      master: mymaster
+      nodes: 47.102.137.78:27001,47.102.137.78:27002,47.102.137.78:27003
+    password: leadRedis$2020
     lettuce:
       pool:
         max-active: 600         #连接池最大连接数（使用负值表示没有限制)
@@ -14,7 +14,7 @@ spring:
         max-idle: 100           #连接池中的最大空闲连接
         min-idle: 5             #连接池中的最小空闲连接
     timeout: 3000               #连接超时时间（毫秒）
-    database: 11
+    database: 2
 
   datasource:
     druid:

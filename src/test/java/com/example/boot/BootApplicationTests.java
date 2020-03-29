@@ -8,6 +8,8 @@ import com.example.boot.model.kuGou.KuGouJson;
 import com.example.boot.model.kuGou.MusicBody;
 import com.example.boot.model.kuGou.MusicDetail;
 import com.example.boot.model.kuGou.MusicList;
+import com.example.boot.service.UserService;
+import com.example.boot.util.SpringUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.outdoor.club.model.admin.ParamConfig;
@@ -108,9 +110,8 @@ public class BootApplicationTests {
 
 	@Test
 	public void test5(){
-		User user = new User().setId(1).setAge(2).setName("猪大肠");
-		String s = restTemplate.postForObject("http://localhost:9000/test5",user, String.class);
-		System.out.println(s);
+		redisTemplate.opsForValue().set("test","猪大肠");
+		System.out.println(redisTemplate.opsForValue().get("test"));
 	}
 
 	//转移redis
@@ -155,7 +156,11 @@ public class BootApplicationTests {
 
 	@Test
 	public void test8() throws InterruptedException {
-		List<Integer> list = Arrays.asList(7,8,9);
-		redisTemplate.opsForList().rightPushAll("a",13,14);
+//		List<Integer> list = Arrays.asList(7,8,9);
+//		redisTemplate.opsForList().rightPushAll("a",13,14);
+		String[] beanNamesForType = SpringUtil.getApplicationContext().getBeanNamesForType(UserService.class);
+		for (String s:beanNamesForType){
+			System.out.println(s);
+		}
 	}
 }
