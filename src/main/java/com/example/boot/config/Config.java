@@ -355,7 +355,7 @@ public class Config {
         for (String node : sentinel.getNodes()) {
             String[] parts = StringUtils.split(node, ":");
             if (parts != null){
-                nodes.add(new RedisNode(parts[0], Integer.valueOf(parts[1])));
+                nodes.add(new RedisNode(parts[0], Integer.parseInt(parts[1])));
             }
         }
         config.setSentinels(nodes);
